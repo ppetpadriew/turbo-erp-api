@@ -8,5 +8,7 @@
             "email": "p.petpadriew@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "laravel/framework": "^5.5"
+    }
 }
