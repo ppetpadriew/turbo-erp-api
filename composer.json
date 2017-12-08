@@ -1,0 +1,12 @@
+{
+    "name": "turbo/turbo-erp-api",
+    "description": "API for TurboERP",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Peeratchai Petpadriew",
+            "email": "p.petpadriew@gmail.com"
+        }
+    ],
+    "require": {}
+}
