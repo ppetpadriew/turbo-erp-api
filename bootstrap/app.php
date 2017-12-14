@@ -12,8 +12,10 @@
 */
 
 $app = new Illuminate\Foundation\Application(
-    realpath(__DIR__ . '/../')
+    realpath(__DIR__ . '/../turbo-erp-api/')
 );
+
+$app->instance('path.bootstrap', __DIR__);
 
 /*
 |--------------------------------------------------------------------------
