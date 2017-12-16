@@ -26,11 +26,11 @@ class CreateAddressTable extends Migration
         ');
         $this->db->statement('
             ALTER TABLE address
-            ADD PRIMARY KEY (id)
+              ADD PRIMARY KEY (id)
         ');
         $this->db->statement('
             ALTER TABLE address
-            MODIFY id int(11) NOT NULL AUTO_INCREMENT
+              MODIFY id int(11) NOT NULL AUTO_INCREMENT
         ');
     }
 
