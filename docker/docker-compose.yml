@@ -13,7 +13,7 @@ services:
       - turbo-erp-api-php-fpm
 
   turbo-erp-mysql-dev:
-      image: mysql:latest
+      image: turboranger/turbo-erp-mysql-dev:latest
       container_name: turbo-erp-mysql-dev
       ports:
         - 43306:3306
