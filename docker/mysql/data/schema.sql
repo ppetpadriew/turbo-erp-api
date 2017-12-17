@@ -102,8 +102,10 @@ CREATE TABLE `item_image` (
 
 CREATE TABLE `item_warehouse` (
   `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `location_controlled` tinyint(1) NOT NULL,
-  `outbound_method` enum('LIFO','FIFO') COLLATE utf8mb4_unicode_ci NOT NULL
+  `outbound_method` enum('LIFO','FIFO') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `negative_inventory_allowed` tinyint(1) NOT NULL,
+  `obsolete` tinyint(1) NOT NULL,
+  `exclude_from_cycle_counting` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -126,7 +128,6 @@ CREATE TABLE `unit` (
 CREATE TABLE `warehouse` (
   `code` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `location_controlled` tinyint(1) NOT NULL,
   `negative_inventory_allowed` tinyint(1) NOT NULL,
   `manual_adjustment_allowed` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
