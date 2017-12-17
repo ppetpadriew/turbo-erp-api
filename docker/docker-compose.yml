@@ -12,9 +12,9 @@ services:
     links:
       - turbo-erp-api-php-fpm
 
-  turbo-erp-api-mysql:
+  turbo-erp-mysql-dev:
       image: mysql:latest
-      container_name: turbo-erp-api-mysql
+      container_name: turbo-erp-mysql-dev
       ports:
         - 43306:3306
       volumes:
@@ -31,7 +31,7 @@ services:
       - ./php-fpm:/usr/local/etc/php/conf.d.user
       - ../composer:/root/composer
     links:
-      - turbo-erp-api-mysql
+      - turbo-erp-mysql-dev
     environment:
       IN_DOCKER: 1
       COMPOSER_ALLOW_SUPERUSER: 1
@@ -48,11 +48,11 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: turbo-erp-api-pma
     links:
-      - turbo-erp-api-mysql
+      - turbo-erp-mysql-dev
     ports:
       - 48183:80
     environment:
-      PMA_HOST: turbo-erp-api-mysql
+      PMA_HOST: turbo-erp-mysql-dev
       PMA_USER: root
       PMA_PASSWORD: root
       PMA_ARBITRARY: 1
