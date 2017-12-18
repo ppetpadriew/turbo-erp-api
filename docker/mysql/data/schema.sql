@@ -130,6 +130,20 @@ CREATE TABLE `warehouse` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- Table structure for table `item_data_by_warehouse`
+--
+
+CREATE TABLE `item_data_by_warehouse` (
+  `warehouse` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reorder_point` double(19,4) NOT NULL,
+  `negative_inventory_allowed` tinyint(1) NOT NULL,
+  `obsolete` tinyint(1) NOT NULL,
+  `exclude_from_cycle_counting` tinyint(1) NOT NULL,
+  `valuation_method` enum('Standard Cost','MAUC','FIFO','LIFO','Lot Price') COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
 -- Indexes for dumped tables
 --
 
@@ -227,6 +241,25 @@ ALTER TABLE `item_image`
 --
 ALTER TABLE `item_warehouse`
   ADD CONSTRAINT `item_warehouse_ibfk_1` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
+
+--
+-- Indexes for table `item_data_by_warehouse`
+--
+ALTER TABLE `item_data_by_warehouse`
+  ADD PRIMARY KEY (`warehouse`,`item`),
+  ADD KEY `warehouse` (`warehouse`),
+  ADD KEY `item` (`item`);
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `item_data_by_warehouse`
+--
+ALTER TABLE `item_data_by_warehouse`
+  ADD CONSTRAINT `item_data_by_warehouse_ibfk_1` FOREIGN KEY (`warehouse`) REFERENCES `warehouse` (`code`),
+  ADD CONSTRAINT `item_data_by_warehouse_ibfk_2` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
