@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 16, 2017 at 06:04 PM
+-- Generation Time: Dec 19, 2017 at 04:18 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -67,6 +67,37 @@ CREATE TABLE `currency` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `enum_inventory_transaction_type`
+--
+
+CREATE TABLE `enum_inventory_transaction_type` (
+  `id` int(11) NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `enum_inventory_transaction_type`
+--
+
+INSERT INTO `enum_inventory_transaction_type` (`id`, `description`) VALUES
+  (1, 'Receipt'),
+  (2, 'Issue'),
+  (3, 'Transfer');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `enum_procedure_type`
+--
+
+CREATE TABLE `enum_procedure_type` (
+  `id` int(11) NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `item`
 --
 
@@ -86,6 +117,22 @@ CREATE TABLE `item` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `item_data_by_warehouse`
+--
+
+CREATE TABLE `item_data_by_warehouse` (
+  `warehouse` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reorder_point` double(19,4) NOT NULL,
+  `negative_inventory_allowed` tinyint(1) NOT NULL,
+  `obsolete` tinyint(1) NOT NULL,
+  `exclude_from_cycle_counting` tinyint(1) NOT NULL,
+  `valuation_method` enum('Standard Cost','MAUC','FIFO','LIFO','Lot Price') COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `item_image`
 --
 
@@ -93,6 +140,21 @@ CREATE TABLE `item_image` (
   `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `path` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `item_inventory_by_warehouse`
+--
+
+CREATE TABLE `item_inventory_by_warehouse` (
+  `warehouse` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `on_hand` double(19,4) NOT NULL,
+  `on_blocked` double(19,4) NOT NULL,
+  `on_order` double(19,4) NOT NULL,
+  `on_allocated` double(19,4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -129,27 +191,20 @@ CREATE TABLE `warehouse` (
   `manual_adjustment_allowed` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
 --
--- Table structure for table `item_data_by_warehouse`
+-- Table structure for table `warehousing_order_type`
 --
 
-CREATE TABLE `item_data_by_warehouse` (
-  `warehouse` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `reorder_point` double(19,4) NOT NULL,
-  `negative_inventory_allowed` tinyint(1) NOT NULL,
-  `obsolete` tinyint(1) NOT NULL,
-  `exclude_from_cycle_counting` tinyint(1) NOT NULL,
-  `valuation_method` enum('Standard Cost','MAUC','FIFO','LIFO','Lot Price') COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `item_inventory_by_warehouse` (
-  `warehouse` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `item` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `on_hand` double(19,4) NOT NULL,
-  `on_blocked` double(19,4) NOT NULL,
-  `on_order` double(19,4) NOT NULL,
-  `on_allocated` double(19,4) NOT NULL
+CREATE TABLE `warehousing_order_type` (
+  `code` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `inventory_transaction_type_id` int(11) NOT NULL,
+  `receipt_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `inspection_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `shipment_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `generate_lots_automatically` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -176,6 +231,18 @@ ALTER TABLE `currency`
   ADD PRIMARY KEY (`code`);
 
 --
+-- Indexes for table `enum_inventory_transaction_type`
+--
+ALTER TABLE `enum_inventory_transaction_type`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `enum_procedure_type`
+--
+ALTER TABLE `enum_procedure_type`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `item`
 --
 ALTER TABLE `item`
@@ -185,10 +252,26 @@ ALTER TABLE `item`
   ADD KEY `weight_unit` (`weight_unit`);
 
 --
+-- Indexes for table `item_data_by_warehouse`
+--
+ALTER TABLE `item_data_by_warehouse`
+  ADD PRIMARY KEY (`warehouse`,`item`),
+  ADD KEY `item` (`item`),
+  ADD KEY `warehouse` (`warehouse`);
+
+--
 -- Indexes for table `item_image`
 --
 ALTER TABLE `item_image`
   ADD PRIMARY KEY (`item`);
+
+--
+-- Indexes for table `item_inventory_by_warehouse`
+--
+ALTER TABLE `item_inventory_by_warehouse`
+  ADD PRIMARY KEY (`warehouse`,`item`),
+  ADD KEY `item` (`item`),
+  ADD KEY `warehouse` (`warehouse`);
 
 --
 -- Indexes for table `item_warehouse`
@@ -209,6 +292,13 @@ ALTER TABLE `warehouse`
   ADD PRIMARY KEY (`code`);
 
 --
+-- Indexes for table `warehousing_order_type`
+--
+ALTER TABLE `warehousing_order_type`
+  ADD PRIMARY KEY (`code`),
+  ADD KEY `inventory_transaction_type_id` (`inventory_transaction_type_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -221,6 +311,16 @@ ALTER TABLE `address`
 -- AUTO_INCREMENT for table `business_partner`
 --
 ALTER TABLE `business_partner`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `enum_inventory_transaction_type`
+--
+ALTER TABLE `enum_inventory_transaction_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT for table `enum_procedure_type`
+--
+ALTER TABLE `enum_procedure_type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- Constraints for dumped tables
@@ -240,10 +340,24 @@ ALTER TABLE `item`
   ADD CONSTRAINT `item_ibfk_2` FOREIGN KEY (`weight_unit`) REFERENCES `unit` (`code`);
 
 --
+-- Constraints for table `item_data_by_warehouse`
+--
+ALTER TABLE `item_data_by_warehouse`
+  ADD CONSTRAINT `item_data_by_warehouse_ibfk_1` FOREIGN KEY (`warehouse`) REFERENCES `warehouse` (`code`),
+  ADD CONSTRAINT `item_data_by_warehouse_ibfk_2` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
+
+--
 -- Constraints for table `item_image`
 --
 ALTER TABLE `item_image`
   ADD CONSTRAINT `item_image_ibfk_1` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
+
+--
+-- Constraints for table `item_inventory_by_warehouse`
+--
+ALTER TABLE `item_inventory_by_warehouse`
+  ADD CONSTRAINT `item_inventory_by_warehouse_ibfk_1` FOREIGN KEY (`warehouse`) REFERENCES `warehouse` (`code`),
+  ADD CONSTRAINT `item_inventory_by_warehouse_ibfk_2` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
 
 --
 -- Constraints for table `item_warehouse`
@@ -252,36 +366,10 @@ ALTER TABLE `item_warehouse`
   ADD CONSTRAINT `item_warehouse_ibfk_1` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
 
 --
--- Indexes for table `item_data_by_warehouse`
+-- Constraints for table `warehousing_order_type`
 --
-ALTER TABLE `item_data_by_warehouse`
-  ADD PRIMARY KEY (`warehouse`,`item`),
-  ADD KEY `warehouse` (`warehouse`),
-  ADD KEY `item` (`item`);
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `item_data_by_warehouse`
---
-ALTER TABLE `item_data_by_warehouse`
-  ADD CONSTRAINT `item_data_by_warehouse_ibfk_1` FOREIGN KEY (`warehouse`) REFERENCES `warehouse` (`code`),
-  ADD CONSTRAINT `item_data_by_warehouse_ibfk_2` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
-
---
--- Indexes for table `item_inventory_by_warehouse`
---
-ALTER TABLE `item_inventory_by_warehouse`
-  ADD PRIMARY KEY (`warehouse`,`item`),
-  ADD KEY `item` (`item`),
-  ADD KEY `warehouse` (`warehouse`);
-
-ALTER TABLE `item_inventory_by_warehouse`
-  ADD CONSTRAINT `item_inventory_by_warehouse_ibfk_1` FOREIGN KEY (`warehouse`) REFERENCES `warehouse` (`code`),
-  ADD CONSTRAINT `item_inventory_by_warehouse_ibfk_2` FOREIGN KEY (`item`) REFERENCES `item` (`code`);
-
+ALTER TABLE `warehousing_order_type`
+  ADD CONSTRAINT `warehousing_order_type_ibfk_1` FOREIGN KEY (`inventory_transaction_type_id`) REFERENCES `enum_inventory_transaction_type` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
