@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 19, 2017 at 04:18 PM
+-- Generation Time: Dec 20, 2017 at 05:31 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -199,12 +199,24 @@ CREATE TABLE `warehouse` (
 
 CREATE TABLE `warehousing_order_type` (
   `code` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `inventory_transaction_type_id` int(11) NOT NULL,
-  `receipt_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `inspection_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `shipment_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receipt_procedure` varchar(3) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `inspection_procedure` varchar(3) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `shipment_procedure` varchar(3) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `generate_lots_automatically` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `warehousing_procedure`
+--
+
+CREATE TABLE `warehousing_procedure` (
+  `code` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `procedure_type_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -299,6 +311,13 @@ ALTER TABLE `warehousing_order_type`
   ADD KEY `inventory_transaction_type_id` (`inventory_transaction_type_id`);
 
 --
+-- Indexes for table `warehousing_procedure`
+--
+ALTER TABLE `warehousing_procedure`
+  ADD PRIMARY KEY (`code`),
+  ADD KEY `procedure_type_id` (`procedure_type_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -370,6 +389,12 @@ ALTER TABLE `item_warehouse`
 --
 ALTER TABLE `warehousing_order_type`
   ADD CONSTRAINT `warehousing_order_type_ibfk_1` FOREIGN KEY (`inventory_transaction_type_id`) REFERENCES `enum_inventory_transaction_type` (`id`);
+
+--
+-- Constraints for table `warehousing_procedure`
+--
+ALTER TABLE `warehousing_procedure`
+  ADD CONSTRAINT `warehousing_procedure_ibfk_1` FOREIGN KEY (`procedure_type_id`) REFERENCES `enum_procedure_type` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
