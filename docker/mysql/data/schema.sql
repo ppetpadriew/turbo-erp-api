@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 20, 2017 at 05:31 PM
+-- Generation Time: Dec 22, 2017 at 12:31 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -19,6 +19,32 @@ SET time_zone = "+00:00";
 --
 -- Database: `turbo_erp`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity`
+--
+
+CREATE TABLE `activity` (
+  `code` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `activity_type_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Dumping data for table `activity`
+--
+
+INSERT INTO `activity` (`code`, `description`, `activity_type_id`) VALUES
+  ('OUT01', 'Warehouse Inspection', 1),
+  ('REC01', 'Print Goods Received Note', 2),
+  ('REC02', 'Warehouse Receipt', 2),
+  ('REC03', 'Confirm Receipt', 2),
+  ('SHP01', 'Confirm Shipment', 4),
+  ('SHP02', 'Print Bill Of Lading', 4),
+  ('SHP03', 'Print Packing Slips', 4),
+  ('SHP04', 'Print Delivery Notes', 4);
 
 -- --------------------------------------------------------
 
@@ -63,6 +89,26 @@ CREATE TABLE `currency` (
   `description` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `rounding_factor` double(10,6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `enum_activity_type`
+--
+
+CREATE TABLE `enum_activity_type` (
+  `id` int(11) NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `enum_activity_type`
+--
+
+INSERT INTO `enum_activity_type` (`id`, `description`) VALUES
+  (1, 'Outbound'),
+  (2, 'Receipt'),
+  (4, 'Shipment');
 
 -- --------------------------------------------------------
 
@@ -224,6 +270,13 @@ CREATE TABLE `warehousing_procedure` (
 --
 
 --
+-- Indexes for table `activity`
+--
+ALTER TABLE `activity`
+  ADD PRIMARY KEY (`code`),
+  ADD KEY `activity_type_id` (`activity_type_id`);
+
+--
 -- Indexes for table `address`
 --
 ALTER TABLE `address`
@@ -241,6 +294,12 @@ ALTER TABLE `business_partner`
 --
 ALTER TABLE `currency`
   ADD PRIMARY KEY (`code`);
+
+--
+-- Indexes for table `enum_activity_type`
+--
+ALTER TABLE `enum_activity_type`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `enum_inventory_transaction_type`
@@ -332,6 +391,11 @@ ALTER TABLE `address`
 ALTER TABLE `business_partner`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `enum_activity_type`
+--
+ALTER TABLE `enum_activity_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+--
 -- AUTO_INCREMENT for table `enum_inventory_transaction_type`
 --
 ALTER TABLE `enum_inventory_transaction_type`
@@ -344,6 +408,12 @@ ALTER TABLE `enum_procedure_type`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `activity`
+--
+ALTER TABLE `activity`
+  ADD CONSTRAINT `activity_ibfk_1` FOREIGN KEY (`activity_type_id`) REFERENCES `enum_activity_type` (`id`);
 
 --
 -- Constraints for table `business_partner`
