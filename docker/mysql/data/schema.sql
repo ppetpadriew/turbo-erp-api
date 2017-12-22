@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 22, 2017 at 12:31 PM
+-- Generation Time: Dec 22, 2017 at 12:47 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -19,6 +19,23 @@ SET time_zone = "+00:00";
 --
 -- Database: `turbo_erp`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activities_by_warehousing_procedure`
+--
+
+CREATE TABLE `activities_by_warehousing_procedure` (
+  `warehousing_procedure` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activity` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activity_number` int(11) NOT NULL,
+  `applicable` tinyint(1) NOT NULL,
+  `automatic` tinyint(1) NOT NULL,
+  `label_printing` tinyint(1) NOT NULL,
+  `label_copies` int(11) NOT NULL,
+  `label_layout_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -216,6 +233,18 @@ CREATE TABLE `item_warehouse` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `label_layout`
+--
+
+CREATE TABLE `label_layout` (
+  `id` int(11) NOT NULL,
+  `description` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `path` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `unit`
 --
 
@@ -268,6 +297,15 @@ CREATE TABLE `warehousing_procedure` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activities_by_warehousing_procedure`
+--
+ALTER TABLE `activities_by_warehousing_procedure`
+  ADD PRIMARY KEY (`warehousing_procedure`,`activity`),
+  ADD KEY `activity` (`activity`),
+  ADD KEY `warehousing_procedure` (`warehousing_procedure`),
+  ADD KEY `label_layout_id` (`label_layout_id`);
 
 --
 -- Indexes for table `activity`
@@ -351,6 +389,12 @@ ALTER TABLE `item_warehouse`
   ADD PRIMARY KEY (`item`);
 
 --
+-- Indexes for table `label_layout`
+--
+ALTER TABLE `label_layout`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `unit`
 --
 ALTER TABLE `unit`
@@ -406,8 +450,21 @@ ALTER TABLE `enum_inventory_transaction_type`
 ALTER TABLE `enum_procedure_type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `label_layout`
+--
+ALTER TABLE `label_layout`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `activities_by_warehousing_procedure`
+--
+ALTER TABLE `activities_by_warehousing_procedure`
+  ADD CONSTRAINT `activities_by_warehousing_procedure_ibfk_1` FOREIGN KEY (`warehousing_procedure`) REFERENCES `warehousing_procedure` (`code`),
+  ADD CONSTRAINT `activities_by_warehousing_procedure_ibfk_2` FOREIGN KEY (`activity`) REFERENCES `activity` (`code`),
+  ADD CONSTRAINT `activities_by_warehousing_procedure_ibfk_3` FOREIGN KEY (`label_layout_id`) REFERENCES `label_layout` (`id`);
 
 --
 -- Constraints for table `activity`
