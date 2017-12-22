@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 22, 2017 at 02:02 PM
+-- Generation Time: Dec 22, 2017 at 04:53 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -127,6 +127,20 @@ CREATE TABLE `currency` (
   `code` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `rounding_factor` double(10,6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `first_free_number`
+--
+
+CREATE TABLE `first_free_number` (
+  `id` int(11) NOT NULL,
+  `number_group_id` int(11) NOT NULL,
+  `series` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_free_number` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -260,6 +274,20 @@ CREATE TABLE `label_layout` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `number_group`
+--
+
+CREATE TABLE `number_group` (
+  `id` int(11) NOT NULL,
+  `code` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `series_length` int(11) NOT NULL,
+  `in_use` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `outbound_method`
 --
 
@@ -332,9 +360,26 @@ CREATE TABLE `warehouse` (
 
 CREATE TABLE `warehouse_master_data_parameter` (
   `id` int(11) NOT NULL,
-  `created_datetime` datetime NOT NULL,
   `description` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_datetime` datetime NOT NULL,
   `lot_control_in_use` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `warehousing_order_parameter`
+--
+
+CREATE TABLE `warehousing_order_parameter` (
+  `id` int(11) NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_datetime` datetime NOT NULL,
+  `first_free_number_id` int(11) NOT NULL,
+  `line_step_size` int(11) NOT NULL,
+  `set_step_size` int(11) NOT NULL,
+  `enable_warehouse_order_history` tinyint(1) NOT NULL,
+  `enable_inbound_line_lots_history` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -424,6 +469,13 @@ ALTER TABLE `currency`
   ADD UNIQUE KEY `code` (`code`);
 
 --
+-- Indexes for table `first_free_number`
+--
+ALTER TABLE `first_free_number`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `combined_1` (`number_group_id`,`series`) USING BTREE;
+
+--
 -- Indexes for table `inventory_transaction_type`
 --
 ALTER TABLE `inventory_transaction_type`
@@ -486,6 +538,13 @@ ALTER TABLE `label_layout`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `number_group`
+--
+ALTER TABLE `number_group`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
 -- Indexes for table `outbound_method`
 --
 ALTER TABLE `outbound_method`
@@ -516,6 +575,13 @@ ALTER TABLE `warehouse`
 --
 ALTER TABLE `warehouse_master_data_parameter`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `warehousing_order_parameter`
+--
+ALTER TABLE `warehousing_order_parameter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `number_group_id` (`first_free_number_id`);
 
 --
 -- Indexes for table `warehousing_order_type`
@@ -576,6 +642,11 @@ ALTER TABLE `business_partner`
 ALTER TABLE `currency`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `first_free_number`
+--
+ALTER TABLE `first_free_number`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `inventory_transaction_type`
 --
 ALTER TABLE `inventory_transaction_type`
@@ -616,6 +687,11 @@ ALTER TABLE `item_warehouse`
 ALTER TABLE `label_layout`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `number_group`
+--
+ALTER TABLE `number_group`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `outbound_method`
 --
 ALTER TABLE `outbound_method`
@@ -639,6 +715,11 @@ ALTER TABLE `warehouse`
 -- AUTO_INCREMENT for table `warehouse_master_data_parameter`
 --
 ALTER TABLE `warehouse_master_data_parameter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `warehousing_order_parameter`
+--
+ALTER TABLE `warehousing_order_parameter`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `warehousing_order_type`
@@ -674,6 +755,12 @@ ALTER TABLE `activity`
   ADD CONSTRAINT `activity_ibfk_1` FOREIGN KEY (`activity_type_id`) REFERENCES `activity_type` (`id`);
 
 --
+-- Constraints for table `first_free_number`
+--
+ALTER TABLE `first_free_number`
+  ADD CONSTRAINT `first_free_number_ibfk_1` FOREIGN KEY (`number_group_id`) REFERENCES `number_group` (`id`);
+
+--
 -- Constraints for table `item`
 --
 ALTER TABLE `item`
@@ -707,6 +794,12 @@ ALTER TABLE `item_inventory_by_warehouse`
 ALTER TABLE `item_warehouse`
   ADD CONSTRAINT `item_warehouse_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`),
   ADD CONSTRAINT `item_warehouse_ibfk_2` FOREIGN KEY (`outbound_method_id`) REFERENCES `outbound_method` (`id`);
+
+--
+-- Constraints for table `warehousing_order_parameter`
+--
+ALTER TABLE `warehousing_order_parameter`
+  ADD CONSTRAINT `warehousing_order_parameter_ibfk_1` FOREIGN KEY (`first_free_number_id`) REFERENCES `first_free_number` (`id`);
 
 --
 -- Constraints for table `warehousing_order_type`
