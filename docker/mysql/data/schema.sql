@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 22, 2017 at 12:47 PM
+-- Generation Time: Dec 22, 2017 at 01:13 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -269,6 +269,18 @@ CREATE TABLE `warehouse` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `warehouse_master_data_parameter`
+--
+
+CREATE TABLE `warehouse_master_data_parameter` (
+  `effective_date` datetime NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lot_control_in_use` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `warehousing_order_type`
 --
 
@@ -405,6 +417,12 @@ ALTER TABLE `unit`
 --
 ALTER TABLE `warehouse`
   ADD PRIMARY KEY (`code`);
+
+--
+-- Indexes for table `warehouse_master_data_parameter`
+--
+ALTER TABLE `warehouse_master_data_parameter`
+  ADD PRIMARY KEY (`effective_date`);
 
 --
 -- Indexes for table `warehousing_order_type`
