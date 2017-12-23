@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 22, 2017 at 04:53 PM
+-- Generation Time: Dec 23, 2017 at 06:47 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -166,6 +166,25 @@ INSERT INTO `inventory_transaction_type` (`id`, `description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inventory_valuation_of_positive_adjustment`
+--
+
+CREATE TABLE `inventory_valuation_of_positive_adjustment` (
+  `id` int(11) NOT NULL,
+  `description` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Dumping data for table `inventory_valuation_of_positive_adjustment`
+--
+
+INSERT INTO `inventory_valuation_of_positive_adjustment` (`id`, `description`) VALUES
+  (1, 'Standard Cost'),
+  (2, 'Inventory Value');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `item`
 --
 
@@ -303,6 +322,22 @@ CREATE TABLE `outbound_method` (
 INSERT INTO `outbound_method` (`id`, `description`) VALUES
   (1, 'LIFO'),
   (2, 'FIFO');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `receipt_parameter`
+--
+
+CREATE TABLE `receipt_parameter` (
+  `id` int(11) NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_datetime` datetime NOT NULL,
+  `first_free_number_id` int(11) NOT NULL,
+  `line_step_size` int(11) NOT NULL,
+  `enable_receipt_history` tinyint(1) NOT NULL,
+  `inventory_valuation_of_positive_adjustment_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -482,6 +517,12 @@ ALTER TABLE `inventory_transaction_type`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `inventory_valuation_of_positive_adjustment`
+--
+ALTER TABLE `inventory_valuation_of_positive_adjustment`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `item`
 --
 ALTER TABLE `item`
@@ -549,6 +590,14 @@ ALTER TABLE `number_group`
 --
 ALTER TABLE `outbound_method`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `receipt_parameter`
+--
+ALTER TABLE `receipt_parameter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_valuation_of_positive_adjustment_id` (`inventory_valuation_of_positive_adjustment_id`),
+  ADD KEY `first_free_number_id` (`first_free_number_id`);
 
 --
 -- Indexes for table `unit`
@@ -652,6 +701,11 @@ ALTER TABLE `first_free_number`
 ALTER TABLE `inventory_transaction_type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
+-- AUTO_INCREMENT for table `inventory_valuation_of_positive_adjustment`
+--
+ALTER TABLE `inventory_valuation_of_positive_adjustment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
 -- AUTO_INCREMENT for table `item`
 --
 ALTER TABLE `item`
@@ -696,6 +750,11 @@ ALTER TABLE `number_group`
 --
 ALTER TABLE `outbound_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `receipt_parameter`
+--
+ALTER TABLE `receipt_parameter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `unit`
 --
@@ -794,6 +853,13 @@ ALTER TABLE `item_inventory_by_warehouse`
 ALTER TABLE `item_warehouse`
   ADD CONSTRAINT `item_warehouse_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`),
   ADD CONSTRAINT `item_warehouse_ibfk_2` FOREIGN KEY (`outbound_method_id`) REFERENCES `outbound_method` (`id`);
+
+--
+-- Constraints for table `receipt_parameter`
+--
+ALTER TABLE `receipt_parameter`
+  ADD CONSTRAINT `receipt_parameter_ibfk_1` FOREIGN KEY (`first_free_number_id`) REFERENCES `first_free_number` (`id`),
+  ADD CONSTRAINT `receipt_parameter_ibfk_2` FOREIGN KEY (`inventory_valuation_of_positive_adjustment_id`) REFERENCES `inventory_valuation_of_positive_adjustment` (`id`);
 
 --
 -- Constraints for table `warehousing_order_parameter`
