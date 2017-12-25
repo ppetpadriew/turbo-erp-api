@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 25, 2017 at 03:46 PM
+-- Generation Time: Dec 25, 2017 at 04:07 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -326,6 +326,26 @@ INSERT INTO `outbound_method` (`id`, `description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `outbound_parameter`
+--
+
+CREATE TABLE `outbound_parameter` (
+  `id` int(11) NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_datetime` datetime NOT NULL,
+  `allow_changes_to_confimed_shipment` tinyint(1) NOT NULL,
+  `enable_shipment_history` tinyint(1) NOT NULL,
+  `consolidated_stock_points_in_one_shipment_line` tinyint(1) NOT NULL,
+  `update_sales_delivery_method_id` int(11) NOT NULL,
+  `shipment_inbound_first_free_number_id` int(11) NOT NULL,
+  `shipment_outbound_first_free_number_id` int(11) NOT NULL,
+  `shipment_step_size` int(11) NOT NULL,
+  `inventory_consumption_first_free_number_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `receipt_parameter`
 --
 
@@ -350,6 +370,26 @@ CREATE TABLE `unit` (
   `code` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `update_sales_delivery_method`
+--
+
+CREATE TABLE `update_sales_delivery_method` (
+  `id` int(11) NOT NULL,
+  `description` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `update_sales_delivery_method`
+--
+
+INSERT INTO `update_sales_delivery_method` (`id`, `description`) VALUES
+  (1, 'Direct'),
+  (2, 'Decoupled'),
+  (3, 'Batch');
 
 -- --------------------------------------------------------
 
@@ -607,6 +647,16 @@ ALTER TABLE `outbound_method`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `outbound_parameter`
+--
+ALTER TABLE `outbound_parameter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `shipment_inbound_first_free_number_id` (`shipment_inbound_first_free_number_id`),
+  ADD KEY `shipment_outbound_first_free_number_id` (`shipment_outbound_first_free_number_id`),
+  ADD KEY `inventory_consumption_first_free_number_id` (`inventory_consumption_first_free_number_id`),
+  ADD KEY `update_sales_delivery_method_id` (`update_sales_delivery_method_id`);
+
+--
 -- Indexes for table `receipt_parameter`
 --
 ALTER TABLE `receipt_parameter`
@@ -620,6 +670,12 @@ ALTER TABLE `receipt_parameter`
 ALTER TABLE `unit`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indexes for table `update_sales_delivery_method`
+--
+ALTER TABLE `update_sales_delivery_method`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `valuation_method`
@@ -775,6 +831,11 @@ ALTER TABLE `number_group`
 ALTER TABLE `outbound_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
+-- AUTO_INCREMENT for table `outbound_parameter`
+--
+ALTER TABLE `outbound_parameter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `receipt_parameter`
 --
 ALTER TABLE `receipt_parameter`
@@ -784,6 +845,11 @@ ALTER TABLE `receipt_parameter`
 --
 ALTER TABLE `unit`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `update_sales_delivery_method`
+--
+ALTER TABLE `update_sales_delivery_method`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `valuation_method`
 --
@@ -882,6 +948,15 @@ ALTER TABLE `item_inventory_by_warehouse`
 ALTER TABLE `item_warehouse`
   ADD CONSTRAINT `item_warehouse_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`),
   ADD CONSTRAINT `item_warehouse_ibfk_2` FOREIGN KEY (`outbound_method_id`) REFERENCES `outbound_method` (`id`);
+
+--
+-- Constraints for table `outbound_parameter`
+--
+ALTER TABLE `outbound_parameter`
+  ADD CONSTRAINT `outbound_parameter_ibfk_1` FOREIGN KEY (`shipment_inbound_first_free_number_id`) REFERENCES `first_free_number` (`id`),
+  ADD CONSTRAINT `outbound_parameter_ibfk_2` FOREIGN KEY (`shipment_outbound_first_free_number_id`) REFERENCES `first_free_number` (`id`),
+  ADD CONSTRAINT `outbound_parameter_ibfk_3` FOREIGN KEY (`inventory_consumption_first_free_number_id`) REFERENCES `first_free_number` (`id`),
+  ADD CONSTRAINT `outbound_parameter_ibfk_4` FOREIGN KEY (`update_sales_delivery_method_id`) REFERENCES `update_sales_delivery_method` (`id`);
 
 --
 -- Constraints for table `receipt_parameter`
