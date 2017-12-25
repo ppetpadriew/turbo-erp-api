@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 23, 2017 at 06:47 PM
+-- Generation Time: Dec 25, 2017 at 03:46 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -390,6 +390,21 @@ CREATE TABLE `warehouse` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `warehouse_inspection_parameter`
+--
+
+CREATE TABLE `warehouse_inspection_parameter` (
+  `id` int(11) NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_datetime` mediumint(9) NOT NULL,
+  `inbound_inspection_first_free_number_id` int(11) NOT NULL,
+  `outbound_inspection_first_free_number_id` int(11) NOT NULL,
+  `quarantine_first_free_number_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `warehouse_master_data_parameter`
 --
 
@@ -620,6 +635,15 @@ ALTER TABLE `warehouse`
   ADD UNIQUE KEY `code` (`code`);
 
 --
+-- Indexes for table `warehouse_inspection_parameter`
+--
+ALTER TABLE `warehouse_inspection_parameter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inbound_inspection_first_free_number_id` (`inbound_inspection_first_free_number_id`),
+  ADD KEY `outbound_inspection_first_free_number_id` (`outbound_inspection_first_free_number_id`),
+  ADD KEY `quarantine_first_free_number_id` (`quarantine_first_free_number_id`);
+
+--
 -- Indexes for table `warehouse_master_data_parameter`
 --
 ALTER TABLE `warehouse_master_data_parameter`
@@ -771,6 +795,11 @@ ALTER TABLE `valuation_method`
 ALTER TABLE `warehouse`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `warehouse_inspection_parameter`
+--
+ALTER TABLE `warehouse_inspection_parameter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `warehouse_master_data_parameter`
 --
 ALTER TABLE `warehouse_master_data_parameter`
@@ -860,6 +889,14 @@ ALTER TABLE `item_warehouse`
 ALTER TABLE `receipt_parameter`
   ADD CONSTRAINT `receipt_parameter_ibfk_1` FOREIGN KEY (`first_free_number_id`) REFERENCES `first_free_number` (`id`),
   ADD CONSTRAINT `receipt_parameter_ibfk_2` FOREIGN KEY (`inventory_valuation_of_positive_adjustment_id`) REFERENCES `inventory_valuation_of_positive_adjustment` (`id`);
+
+--
+-- Constraints for table `warehouse_inspection_parameter`
+--
+ALTER TABLE `warehouse_inspection_parameter`
+  ADD CONSTRAINT `warehouse_inspection_parameter_ibfk_1` FOREIGN KEY (`inbound_inspection_first_free_number_id`) REFERENCES `first_free_number` (`id`),
+  ADD CONSTRAINT `warehouse_inspection_parameter_ibfk_2` FOREIGN KEY (`outbound_inspection_first_free_number_id`) REFERENCES `first_free_number` (`id`),
+  ADD CONSTRAINT `warehouse_inspection_parameter_ibfk_3` FOREIGN KEY (`quarantine_first_free_number_id`) REFERENCES `first_free_number` (`id`);
 
 --
 -- Constraints for table `warehousing_order_parameter`
