@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 25, 2017 at 04:07 PM
+-- Generation Time: Dec 26, 2017 at 02:06 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.0.15
 
@@ -100,6 +100,21 @@ CREATE TABLE `address` (
   `province` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `zip_code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
   `country` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `adjustment_order_parameter`
+--
+
+CREATE TABLE `adjustment_order_parameter` (
+  `id` int(11) NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_datetime` datetime NOT NULL,
+  `enable_adjustment_order_history` tinyint(1) NOT NULL,
+  `first_free_number_id` int(11) NOT NULL,
+  `step_size` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -545,6 +560,13 @@ ALTER TABLE `address`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `adjustment_order_parameter`
+--
+ALTER TABLE `adjustment_order_parameter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `first_free_number_id` (`first_free_number_id`);
+
+--
 -- Indexes for table `business_partner`
 --
 ALTER TABLE `business_partner`
@@ -761,6 +783,11 @@ ALTER TABLE `activity_type`
 ALTER TABLE `address`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `adjustment_order_parameter`
+--
+ALTER TABLE `adjustment_order_parameter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `business_partner`
 --
 ALTER TABLE `business_partner`
@@ -907,6 +934,12 @@ ALTER TABLE `activities_by_warehousing_procedure`
 --
 ALTER TABLE `activity`
   ADD CONSTRAINT `activity_ibfk_1` FOREIGN KEY (`activity_type_id`) REFERENCES `activity_type` (`id`);
+
+--
+-- Constraints for table `adjustment_order_parameter`
+--
+ALTER TABLE `adjustment_order_parameter`
+  ADD CONSTRAINT `adjustment_order_parameter_ibfk_1` FOREIGN KEY (`first_free_number_id`) REFERENCES `first_free_number` (`id`);
 
 --
 -- Constraints for table `first_free_number`
