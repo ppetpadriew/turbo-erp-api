@@ -11,9 +11,24 @@
 |
 */
 
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\UnitController;
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$controllers = [
+    'items' => ItemController::class,
+    'units' => UnitController::class
+];
+foreach ($controllers as $resource => $controller) {
+    $baseName = class_basename($controller);
+    $router->get("/{$resource}", "{$baseName}@index");
+    $router->post("/{$resource}", "{$baseName}@create");
+    $router->put("/{$resource}/{id}", "{$baseName}@update");
+    $router->delete("/{$resource}/{id}", "{$baseName}@delete");
+}
 
 
 $router->get('/test[/{id}]', function($id = null) {
