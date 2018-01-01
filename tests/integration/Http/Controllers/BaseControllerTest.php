@@ -89,4 +89,14 @@ class BaseControllerTest extends Integration
             'id' => 1
         ]);
     }
+
+
+    public function testDeleteWithException()
+    {
+        (new BaseControllerSeeder)->run();
+        $controller = new DummyController();
+        $this->expectException(HttpException::class);
+
+        $controller->delete(0);
+    }
 }
