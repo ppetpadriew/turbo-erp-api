@@ -17,11 +17,20 @@ class BaseController extends Controller
         return $this->modelClass::all();
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function create(Request $request)
     {
         return $this->modelClass::create($request->toArray());
     }
 
+    /**
+     * @param int $id
+     * @param Request $request
+     * @return Model
+     */
     public function update(int $id, Request $request)
     {
         /** @var Model $record */
@@ -38,6 +47,10 @@ class BaseController extends Controller
         return $record;
     }
 
+    /**
+     * @param int $id
+     * @return Model
+     */
     public function delete(int $id)
     {
         /** @var Model $record */
