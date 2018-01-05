@@ -3,19 +3,21 @@
 namespace App\Tests\Integration;
 
 use App\Constants\Service;
-use App\Tests\TestCase;
-use Illuminate\Database\Connection;
+use App\Tests\Unit\Unit;
+use Illuminate\Support\Facades\Facade;
 
-class Integration extends TestCase
+/**
+ * It is kinda like Unit but features that use multiple classes/methods are tested.
+ * @property-read \IntegrationTester $tester
+ */
+class Integration extends Unit
 {
-    /** @var Connection */
     protected $db;
 
-    public function createApplication()
+    public function _before()
     {
-        $app =  parent::createApplication();
-        $this->db = $this->app[Service::DB];
+        parent::_before();
 
-        return $app;
+        $this->db = Facade::getFacadeApplication()->make(Service::DB);
     }
 }
