@@ -5,3 +5,6 @@ Homestead.json
 Homestead.yaml
 .env
 composer/
+tests/_output
+tests/_support/_generated
+tests/_data
