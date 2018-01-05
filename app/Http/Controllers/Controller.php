@@ -34,9 +34,9 @@ class BaseController extends Controller
     public function update(int $id, Request $request)
     {
         /** @var Model $record */
-        $record =  $this->modelClass::find($id);
+        $record = $this->modelClass::find($id);
 
-        if(empty($record)) {
+        if (empty($record)) {
             throw new HttpException(404, 'Record not found.');
         }
 
@@ -54,9 +54,9 @@ class BaseController extends Controller
     public function delete(int $id)
     {
         /** @var Model $record */
-        $record =  $this->modelClass::find($id);
+        $record = $this->modelClass::find($id);
 
-        if(empty($record)) {
+        if (empty($record)) {
             throw new HttpException(404, 'Record not found.');
         }
 

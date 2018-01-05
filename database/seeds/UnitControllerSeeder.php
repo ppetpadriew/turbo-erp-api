@@ -2,9 +2,10 @@
 
 namespace App\Database\Seeds;
 
+
 use App\Models\Unit;
 
-class BaseControllerSeeder extends Seeder
+class UnitControllerSeeder extends Seeder
 {
     /**
      * Run the database seeds.

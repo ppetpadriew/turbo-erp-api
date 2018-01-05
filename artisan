@@ -4,6 +4,7 @@
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+require_once __DIR__ . '/vendor/autoload.php';
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -15,7 +16,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 |
 */
 
-$app = require __DIR__.'/bootstrap/app.php';
+(new Dotenv\Dotenv(__DIR__))->load();
+(new Dotenv\Dotenv(__DIR__, '.env.default'))->load();
+
+$app = require __DIR__ . '/app/bootstrap.php';
 
 /*
 |--------------------------------------------------------------------------

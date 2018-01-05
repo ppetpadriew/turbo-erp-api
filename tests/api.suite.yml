@@ -1,0 +1,16 @@
+actor: ApiTester
+modules:
+    enabled:
+        - \Helper\Api
+        - Db:
+        - Lumen:
+            bootstrap: app/bootstrap.php
+            url: http://turbo-erp-api-nginx/
+        - REST:
+            # Your base API URL
+            #url: http://turbo-erp-api-nginx/
+            # Can also be a framework module name
+            #depends: PhpBrowser
+            depends: Lumen
+            # Limits PhpBrowser to JSON or XML
+            part: Json

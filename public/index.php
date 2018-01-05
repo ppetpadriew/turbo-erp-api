@@ -11,7 +11,12 @@
 |
 */
 
-$app = require __DIR__.'/../bootstrap/app.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+(new Dotenv\Dotenv(__DIR__ . '/../'))->load();
+(new Dotenv\Dotenv(__DIR__ . '/../', '.env.default'))->load();
+
+$app = require __DIR__ . '/../app/bootstrap.php';
 
 /*
 |--------------------------------------------------------------------------
