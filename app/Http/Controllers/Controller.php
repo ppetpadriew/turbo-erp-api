@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\ResponseStatus;
+use App\Http\FormattedResponse;
 use App\Models\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -23,6 +26,12 @@ class BaseController extends Controller
      */
     public function create(Request $request)
     {
+        $validator = Validator::make($request->all(), $this->modelClass::$rules);
+
+        if ($validator->fails()) {
+            return new FormattedResponse(ResponseStatus::FAIL, $validator->errors());
+        }
+
         return $this->modelClass::create($request->toArray());
     }
 
@@ -40,6 +49,12 @@ class BaseController extends Controller
             throw new HttpException(404, 'Record not found.');
         }
 
+        $validator = Validator::make($request->all(), $this->modelClass::$rules);
+
+        if ($validator->fails()) {
+            return new FormattedResponse(ResponseStatus::FAIL, $validator->errors());
+        }
+
         $record->fill($request->toArray());
 
         $record->save();
@@ -50,6 +65,7 @@ class BaseController extends Controller
     /**
      * @param int $id
      * @return Model
+     * @throws \Exception
      */
     public function delete(int $id)
     {

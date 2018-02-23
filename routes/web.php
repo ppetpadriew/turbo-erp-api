@@ -11,7 +11,6 @@
 |
 */
 
-use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UnitController;
 
 $router->get('/', function () use ($router) {
@@ -19,8 +18,7 @@ $router->get('/', function () use ($router) {
 });
 
 $controllers = [
-    'items' => ItemController::class,
-    'units' => UnitController::class
+    'units' => UnitController::class,
 ];
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);
@@ -29,12 +27,3 @@ foreach ($controllers as $resource => $controller) {
     $router->put("/{$resource}/{id}", "{$baseName}@update");
     $router->delete("/{$resource}/{id}", "{$baseName}@delete");
 }
-
-
-$router->get('/test[/{id}]', function($id = null) {
-    return [
-        'id' => $id,
-        'name' => 'turbo',
-        'age' => 23
-    ];
-});

@@ -11,9 +11,10 @@
 |
 */
 
-$app = new Laravel\Lumen\Application(
-    realpath(__DIR__ . '/turbo-erp-api/')
-);
+if (!$basePath = realpath(__DIR__ . '/../')) {
+    throw new \Exception('Your base path configuration is not correct.');
+}
+$app = new \App\Application($basePath);
 
 $app->withFacades();
 
@@ -51,9 +52,9 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    \App\Http\Middleware\FormatResponse::class,
+]);
 
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,

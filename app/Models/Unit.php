@@ -3,7 +3,8 @@
 namespace App\Models;
 
 
-class Unit extends Model {
+class Unit extends Model
+{
 
     const TABLE = 'unit';
 
@@ -13,12 +14,13 @@ class Unit extends Model {
     /** @var array */
     protected $fillable = [
         'code',
-        'description'
+        'description',
     ];
 
     /** @var array */
     public static $rules = [
-        // Validation rules
+        'code'        => 'required',
+        'description' => 'required',
     ];
 
     // Relationships
