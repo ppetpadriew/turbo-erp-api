@@ -53,7 +53,7 @@ $app->singleton(
 */
 
 $app->middleware([
-    \App\Http\Middleware\FormatResponse\FormatResponse::class,
+    \App\Http\Middleware\FormatResponse::class,
 ]);
 
 // $app->routeMiddleware([
