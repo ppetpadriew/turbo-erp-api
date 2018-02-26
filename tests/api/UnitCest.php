@@ -14,8 +14,11 @@ class UnitCest
         $I->sendGET($this->baseUrl);
         $I->seeResponseCodeIs(200);
         $I->seeResponseJsonEquals([
-            ['id' => 1, 'code' => 'un1', 'description' => 'un1 desc'],
-            ['id' => 2, 'code' => 'un2', 'description' => 'un2 desc'],
+            'status' => 'success',
+            'data'   => [
+                ['id' => 1, 'code' => 'un1', 'description' => 'un1 desc'],
+                ['id' => 2, 'code' => 'un2', 'description' => 'un2 desc'],
+            ],
         ]);
     }
 
@@ -28,18 +31,26 @@ class UnitCest
         ]);
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
-        $I->seeResponseContainsJson(['code' => 'xxx', 'description' => 'xxx desc']);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => ['code' => 'xxx', 'description' => 'xxx desc'],
+        ]);
     }
 
     public function updateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $I->sendPUT("{$this->baseUrl}/1", [
+            'code'        => 'cj1',
             'description' => 'updated',
         ]);
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
-        $I->seeResponseContainsJson(['id' => 1, 'description' => 'updated']);
+
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('success');
+        verify('Should be able to update description.', $response['data']['description'])->equals('updated');
+        verify('Should be unable to update code.', $response['data']['code'])->notEquals('cj1');
     }
 
     public function updateNonExistentUnit(ApiTester $I)
@@ -49,10 +60,10 @@ class UnitCest
             'description' => 'updated',
         ]);
         $I->seeResponseCodeIs(404);
-//        $I->seeResponseIsJson();
-//        $I->seeResponseContainsJson([
-//            'status' => 'error',
-//        ]);
+        $I->seeResponseIsJson();
+        $I->seeResponseContainsJson([
+            'status' => 'error',
+        ]);
     }
 
     public function deleteUnit(ApiTester $I)
@@ -62,7 +73,10 @@ class UnitCest
         $I->seeResponseCodeIs(200);
         $I->dontSeeInDatabase(Unit::TABLE, ['id' => 1]);
         $I->seeResponseIsJson();
-        $I->seeResponseContainsJson(['id' => 1, 'description' => 'un1 desc']);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => ['id' => 1, 'description' => 'un1 desc'],
+        ]);
     }
 
     public function deleteNonExistentUnit(ApiTester $I)
@@ -70,9 +84,9 @@ class UnitCest
         (new UnitControllerSeeder)->run();
         $I->sendDELETE("{$this->baseUrl}/99");
         $I->seeResponseCodeIs(404);
-//        $I->seeResponseIsJson();
-//        $I->seeResponseContainsJson([
-//            'status' => 'error',
-//        ]);
+        $I->seeResponseIsJson();
+        $I->seeResponseContainsJson([
+            'status' => 'error',
+        ]);
     }
 }
