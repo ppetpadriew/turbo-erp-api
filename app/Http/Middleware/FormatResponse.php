@@ -5,8 +5,10 @@ namespace App\Http\Middleware;
 
 use App\Constants\ResponseStatus;
 use App\Http\FormattedResponse;
+use App\Http\ResponseFormatter;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class FormatResponse
 {
@@ -14,14 +16,6 @@ class FormatResponse
     {
         $response = $next($request);
 
-        if ($response instanceof FormattedResponse) {
-            return $response;
-        }
-
-        if (isset($response->exception)) {
-            return new FormattedResponse(ResponseStatus::ERROR, $response->exception->getMessage());
-        }
-
-        return new FormattedResponse(ResponseStatus::SUCCESS, $response->original);
+        return (new ResponseFormatter)->format($response);
     }
 }

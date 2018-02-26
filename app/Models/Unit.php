@@ -13,16 +13,23 @@ class Unit extends Model
 
     /** @var array */
     protected $fillable = [
-        'code',
-        'description',
+        self::SCENARIO_CREATE => ['code', 'description'],
+        self::SCENARIO_UPDATE => ['description'],
     ];
 
     /** @var array */
     public static $rules = [
-        'code'        => 'required',
-        'description' => 'required',
+        self::SCENARIO_CREATE => [
+            'code'        => 'required',
+            'description' => 'required',
+        ],
+        self::SCENARIO_UPDATE => [],
     ];
 
-    // Relationships
+    public function getFillable(): array
+    {
+        return $this->fillable[$this->scenario];
+    }
 
+    // Relationships
 }

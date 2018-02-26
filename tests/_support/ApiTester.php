@@ -33,4 +33,9 @@ class ApiTester extends \Codeception\Actor
         $this->seeResponseIsJson();
         return $this->seeResponseEquals(json_encode($expected));
     }
+
+    public function grabJsonResponse()
+    {
+        return json_decode($this->grabResponse(), true);
+    }
 }

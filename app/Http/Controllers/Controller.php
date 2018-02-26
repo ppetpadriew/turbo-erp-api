@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Constants\ResponseStatus;
-use App\Http\FormattedResponse;
 use App\Models\Model;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -26,10 +25,10 @@ class BaseController extends Controller
      */
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), $this->modelClass::$rules);
+        $validator = Validator::make($request->all(), $this->modelClass::$rules[$this->modelClass::SCENARIO_CREATE]);
 
         if ($validator->fails()) {
-            return new FormattedResponse(ResponseStatus::FAIL, $validator->errors());
+            return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
         }
 
         return $this->modelClass::create($request->toArray());
@@ -49,10 +48,10 @@ class BaseController extends Controller
             throw new HttpException(404, 'Record not found.');
         }
 
-        $validator = Validator::make($request->all(), $this->modelClass::$rules);
+        $validator = Validator::make($request->all(), $this->modelClass::$rules[$this->modelClass::SCENARIO_UPDATE]);
 
         if ($validator->fails()) {
-            return new FormattedResponse(ResponseStatus::FAIL, $validator->errors());
+            return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
         }
 
         $record->fill($request->toArray());
