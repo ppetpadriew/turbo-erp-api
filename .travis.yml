@@ -1,0 +1,34 @@
+sudo: required
+
+cache:
+  directories:
+  - composer/cache
+
+git:
+  depth: 1
+
+services:
+  - docker
+  - docker-compose
+
+before_install:
+  - 'chmod +x ./travis_install.sh'
+  - 'travis_retry docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}'
+
+install:
+  - './travis_install.sh'
+  - 'docker-compose -f ./docker/docker-compose.yml up -d'
+  - 'docker exec turbo-erp-api-php-fpm sh -c "composer install --no-progress --no-suggest"'
+
+before_script:
+  - 'docker exec turbo-erp-api-php-fpm sh -c "php artisan migrate --force"'
+  - 'docker exec turbo-erp-mysql-dev sh -c "mysql -u root -proot -e \"CREATE DATABASE IF NOT EXISTS codeception_test\""'
+  - 'docker exec turbo-erp-mysql-dev sh -c "mysqldump -u root -proot --no-data turbo_erp | mysql -u root -proot -D codeception_test"'
+
+script:
+  - 'docker exec turbo-erp-api-php-fpm sh -c "vendor/bin/codecept run unit,integration,api --steps --coverage --coverage-xml"'
+
+language: php
+php:
+  - '7.1'
+  - nightly
