@@ -1,5 +1,7 @@
 sudo: required
 
+language: bash
+
 cache:
   directories:
   - composer/cache
@@ -21,14 +23,9 @@ install:
   - 'docker exec turbo-erp-api-php-fpm sh -c "composer install --no-progress --no-suggest"'
 
 before_script:
-  - 'docker exec turbo-erp-api-php-fpm sh -c "php artisan migrate --force"'
-  - 'docker exec turbo-erp-mysql-dev sh -c "mysql -u root -proot -e \"CREATE DATABASE IF NOT EXISTS codeception_test\""'
-  - 'docker exec turbo-erp-mysql-dev sh -c "mysqldump -u root -proot --no-data turbo_erp | mysql -u root -proot -D codeception_test"'
+  - 'docker exec turbo-erp-api-php-fpm sh -c "php artisan migrate -n"'
+  - 'docker exec turbo-erp-mysql-dev sh -c "mysql -e \"CREATE DATABASE IF NOT EXISTS codeception_test\""'
+  - 'docker exec turbo-erp-mysql-dev sh -c "mysqldump --no-data turbo_erp | mysql -D codeception_test"'
 
 script:
   - 'docker exec turbo-erp-api-php-fpm sh -c "vendor/bin/codecept run unit,integration,api --steps --coverage --coverage-xml"'
-
-language: php
-php:
-  - '7.1'
-  - nightly
