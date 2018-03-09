@@ -25,7 +25,8 @@ class BaseController extends Controller
      */
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), $this->modelClass::$rules[$this->modelClass::SCENARIO_CREATE]);
+        $instance = new $this->modelClass;
+        $validator = Validator::make($request->all(), $instance->getRules($this->modelClass::SCENARIO_CREATE));
 
         if ($validator->fails()) {
             return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
@@ -48,7 +49,7 @@ class BaseController extends Controller
             throw new HttpException(404, 'Record not found.');
         }
 
-        $validator = Validator::make($request->all(), $this->modelClass::$rules[$this->modelClass::SCENARIO_UPDATE]);
+        $validator = Validator::make($request->all(), $record->getRules($this->modelClass::SCENARIO_UPDATE));
 
         if ($validator->fails()) {
             return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);

@@ -37,6 +37,21 @@ class UnitCest
         ]);
     }
 
+    public function createUnitWithAlreadyExistCode(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $I->sendPOST($this->baseUrl, [
+            'code'        => 'un1',
+            'description' => 'duplicated',
+        ]);
+        $I->seeResponseCodeIs(400);
+        $I->seeResponseIsJson();
+
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        verify($response['data'])->hasKey('code');
+    }
+
     public function updateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();

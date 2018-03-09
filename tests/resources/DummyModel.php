@@ -17,4 +17,9 @@ class DummyModel extends Model
         'code',
         'description',
     ];
+
+    public function getRules(string $scenario): array
+    {
+        return [];
+    }
 }

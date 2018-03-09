@@ -68,4 +68,6 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
         return $model;
     }
+
+    abstract public function getRules(string $scenario): array;
 }
