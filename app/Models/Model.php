@@ -30,7 +30,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         if (empty(static::TABLE)) {
             throw new \Exception('Please define table name in model class.');
         }
-        
+
         $this->table = static::TABLE;
         parent::__construct($attributes);
     }
@@ -65,7 +65,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
     public function fillable(array $fillable)
     {
-        throw new \Exception('We do not allow to set fillable dynamically.');
+        throw new \Exception('We do not allow to set fillable dynamically from the outside.');
+    }
+
+    public function getFillable()
+    {
+        throw new \Exception('Please define fillable fields in your subclasses.');
     }
 
     public function newInstance($attributes = [], $exists = false)

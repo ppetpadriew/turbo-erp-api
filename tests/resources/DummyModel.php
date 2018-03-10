@@ -11,13 +11,18 @@ class DummyModel extends Model
     const SCENARIO_X = 'x';
     const SCENARIO_Y = 'y';
 
-    protected $fillable = [
-        'code',
-        'description',
-    ];
-
     public function getRules(string $scenario): array
     {
         return [];
+    }
+
+    public function getFillable()
+    {
+        $fillable = [
+            self::SCENARIO_CREATE => ['code', 'description'],
+            self::SCENARIO_UPDATE => ['code', 'description'],
+        ];
+
+        return $fillable[$this->scenario];
     }
 }
