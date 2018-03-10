@@ -7,6 +7,7 @@ use ReflectionClass;
 
 abstract class Model extends \Illuminate\Database\Eloquent\Model
 {
+    const TABLE = '';
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
 
@@ -23,6 +24,16 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
     const CREATED_AT = 'created_datetime';
     const UPDATED_AT = 'updated_datetime';
+
+    public function __construct(array $attributes = [])
+    {
+        if (empty(static::TABLE)) {
+            throw new \Exception('Please define table name in model class.');
+        }
+        
+        $this->table = static::TABLE;
+        parent::__construct($attributes);
+    }
 
     public function setScenario(string $scenario): void
     {

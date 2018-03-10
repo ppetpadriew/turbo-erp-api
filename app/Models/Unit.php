@@ -7,9 +7,6 @@ class Unit extends Model
 {
     const TABLE = 'unit';
 
-    /** @var string */
-    protected $table = self::TABLE;
-
     public function getRules(string $scenario): array
     {
         $rules = [
