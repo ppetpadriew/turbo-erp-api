@@ -11,7 +11,7 @@ class Unit extends Model
     {
         $rules = [
             self::SCENARIO_CREATE => [
-                'code'        => ['required', "unique:{$this->table}"],
+                'code'        => ['required', "unique:{$this->table}", 'max:3'],
                 'description' => ['required'],
             ],
             self::SCENARIO_UPDATE => [],

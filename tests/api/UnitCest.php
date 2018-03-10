@@ -53,6 +53,25 @@ class UnitCest
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         verify($response['data'])->hasKey('code');
+        verify($response['data']['code'])->contains('The code has already been taken.');
+        $I->seeNumRecords($numOfRecords, Unit::TABLE);
+    }
+
+    public function createUnitWithTooLongCode(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
+        $I->sendPOST($this->baseUrl, [
+            'code'        => 'way too long unit code',
+            'description' => 'super long unit',
+        ]);
+        $I->seeResponseCodeIs(400);
+        $I->seeResponseIsJson();
+
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        verify($response['data'])->hasKey('code');
+        verify($response['data']['code'])->contains('The code may not be greater than 3 characters.');
         $I->seeNumRecords($numOfRecords, Unit::TABLE);
     }
 
