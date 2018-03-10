@@ -5,17 +5,10 @@ namespace App\Models;
 
 class Unit extends Model
 {
-
     const TABLE = 'unit';
 
     /** @var string */
     protected $table = self::TABLE;
-
-    /** @var array */
-    protected $fillable = [
-        self::SCENARIO_CREATE => ['code', 'description'],
-        self::SCENARIO_UPDATE => ['description'],
-    ];
 
     public function getRules(string $scenario): array
     {
@@ -34,7 +27,12 @@ class Unit extends Model
 
     public function getFillable(): array
     {
-        return $this->fillable[$this->scenario];
+        $fillable = [
+            self::SCENARIO_CREATE => ['code', 'description'],
+            self::SCENARIO_UPDATE => ['description'],
+        ];
+
+        return $fillable[$this->scenario];
     }
 
     // Relationships
