@@ -10,14 +10,17 @@ use App\Database\Seeds\UnitControllerSeeder;
  *
  * Test the generic things on base controller which apply to all controllers
  */
-class BaseControllerCest
+class BaseControllerCest extends BaseCest
 {
-    private $baseUrl = '/units';
+    public function getBaseUrl(): string
+    {
+        return '/units';
+    }
 
     public function deleteNonExistentUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $I->sendDELETE("{$this->baseUrl}/99");
+        $I->sendDELETE("{$this->getBaseUrl()}/99");
         $I->seeResponseCodeIs(404);
         $I->seeResponseIsJson();
         $I->seeResponseContainsJson([
@@ -28,7 +31,7 @@ class BaseControllerCest
     public function updateNonExistentUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $I->sendPUT("{$this->baseUrl}/99", [
+        $I->sendPUT("{$this->getBaseUrl()}/99", [
             'description' => 'updated',
         ]);
         $I->seeResponseCodeIs(404);

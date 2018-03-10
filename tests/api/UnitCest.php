@@ -7,15 +7,18 @@ use App\Database\Seeds\UnitControllerSeeder;
 use App\Models\Unit;
 use App\Tests\ValidationMessage;
 
-class UnitCest
+class UnitCest extends BaseCest
 {
-    private $baseUrl = '/units';
+    public function getBaseUrl(): string
+    {
+        return '/units';
+    }
 
     public function getUnits(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
 
-        $I->sendGET($this->baseUrl);
+        $I->sendGET($this->getBaseUrl());
 
         $I->seeResponseCodeIs(200);
         $I->seeResponseJsonEquals([
@@ -32,7 +35,7 @@ class UnitCest
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
 
-        $I->sendPOST($this->baseUrl, [
+        $I->sendPOST($this->getBaseUrl(), [
             'code'        => 'xxx',
             'description' => 'xxx desc',
         ]);
@@ -51,7 +54,7 @@ class UnitCest
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
 
-        $I->sendPOST($this->baseUrl, []);
+        $I->sendPOST($this->getBaseUrl(), []);
 
         $I->seeResponseCodeIs(400);
         $I->seeResponseIsJson();
@@ -69,7 +72,7 @@ class UnitCest
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
 
-        $I->sendPOST($this->baseUrl, [
+        $I->sendPOST($this->getBaseUrl(), [
             'code'        => 'un1',
             'description' => 'duplicated',
         ]);
@@ -88,7 +91,7 @@ class UnitCest
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
 
-        $I->sendPOST($this->baseUrl, [
+        $I->sendPOST($this->getBaseUrl(), [
             'code'        => 'way too long unit code',
             'description' => 'super long unit' . str_repeat('x', 40),
         ]);
@@ -108,7 +111,7 @@ class UnitCest
     {
         (new UnitControllerSeeder)->run();
 
-        $I->sendPUT("{$this->baseUrl}/1", [
+        $I->sendPUT("{$this->getBaseUrl()}/1", [
             'code'        => 'cj1',
             'description' => 'updated',
         ]);
@@ -130,7 +133,7 @@ class UnitCest
     {
         (new UnitControllerSeeder)->run();
 
-        $I->sendPUT("{$this->baseUrl}/1", [
+        $I->sendPUT("{$this->getBaseUrl()}/1", [
             'description' => 'super long unit' . str_repeat('x', 40),
         ]);
 
@@ -151,7 +154,7 @@ class UnitCest
     {
         (new UnitControllerSeeder)->run();
 
-        $I->sendDELETE("{$this->baseUrl}/1");
+        $I->sendDELETE("{$this->getBaseUrl()}/1");
 
         $I->seeResponseCodeIs(200);
         $I->dontSeeInDatabase(Unit::TABLE, ['id' => 1]);

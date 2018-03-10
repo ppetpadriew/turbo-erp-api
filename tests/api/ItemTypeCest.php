@@ -6,16 +6,19 @@ use ApiTester;
 use App\Database\Seeds\ItemTypeControllerSeeder;
 use App\Models\ItemType;
 
-class ItemTypeCest
+class ItemTypeCest extends BaseCest
 {
-    private $baseUrl = '/item_types';
+    public function getBaseUrl(): string
+    {
+        return '/item_types';
+    }
 
     public function createItemTypeWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
 
-        $I->sendPOST($this->baseUrl, [
+        $I->sendPOST($this->getBaseUrl(), [
             'nonexistence field' => 'foo',
         ]);
 
@@ -30,7 +33,7 @@ class ItemTypeCest
         (new ItemTypeControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
 
-        $I->sendPOST($this->baseUrl, [
+        $I->sendPOST($this->getBaseUrl(), [
             'description' => 'type 99',
         ]);
 
@@ -50,7 +53,7 @@ class ItemTypeCest
         (new ItemTypeControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
 
-        $I->sendPOST($this->baseUrl, [
+        $I->sendPOST($this->getBaseUrl(), [
             'description' => 'type 1',
         ]);
 
@@ -66,7 +69,7 @@ class ItemTypeCest
     {
         (new ItemTypeControllerSeeder)->run();
 
-        $I->sendPUT("{$this->baseUrl}/1", [
+        $I->sendPUT("{$this->getBaseUrl()}/1", [
             'description' => 'type 2',
         ]);
 
@@ -85,7 +88,7 @@ class ItemTypeCest
     {
         (new ItemTypeControllerSeeder)->run();
 
-        $I->sendPUT("{$this->baseUrl}/1", [
+        $I->sendPUT("{$this->getBaseUrl()}/1", [
             'description' => 'type 1', // Client didn't change this but change other fields
         ]);
 
