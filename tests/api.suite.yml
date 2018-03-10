@@ -4,6 +4,7 @@ modules:
         - \Helper\Api
         - Db:
         - Lumen:
+            cleanup: false
             bootstrap: app/bootstrap.php
             url: http://turbo-erp-api-nginx/
         - REST:
