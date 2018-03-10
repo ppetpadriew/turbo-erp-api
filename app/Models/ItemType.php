@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
 class ItemType extends Model
@@ -33,5 +34,10 @@ class ItemType extends Model
         ];
 
         return $fillable[$this->scenario];
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class);
     }
 }
