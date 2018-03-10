@@ -77,19 +77,6 @@ class UnitCest
         ]);
     }
 
-    public function updateNonExistentUnit(ApiTester $I)
-    {
-        (new UnitControllerSeeder)->run();
-        $I->sendPUT("{$this->baseUrl}/99", [
-            'description' => 'updated',
-        ]);
-        $I->seeResponseCodeIs(404);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'error',
-        ]);
-    }
-
     public function deleteUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
@@ -100,17 +87,6 @@ class UnitCest
         $I->seeResponseContainsJson([
             'status' => 'success',
             'data'   => ['id' => 1, 'description' => 'un1 desc'],
-        ]);
-    }
-
-    public function deleteNonExistentUnit(ApiTester $I)
-    {
-        (new UnitControllerSeeder)->run();
-        $I->sendDELETE("{$this->baseUrl}/99");
-        $I->seeResponseCodeIs(404);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'error',
         ]);
     }
 }
