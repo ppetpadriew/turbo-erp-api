@@ -1,6 +1,8 @@
 <?php
 
+namespace App\Tests\Api;
 
+use ApiTester;
 use App\Database\Seeds\UnitControllerSeeder;
 use App\Models\Unit;
 use App\Tests\ValidationMessage;

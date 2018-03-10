@@ -1,5 +1,8 @@
 <?php
 
+namespace App\Tests\Api;
+
+use ApiTester;
 use App\Database\Seeds\ItemTypeControllerSeeder;
 use App\Models\ItemType;
 
