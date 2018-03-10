@@ -25,6 +25,7 @@ class UnitCest
     public function createUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
+        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
         $I->sendPOST($this->baseUrl, [
             'code'        => 'xxx',
             'description' => 'xxx desc',
@@ -35,11 +36,13 @@ class UnitCest
             'status' => 'success',
             'data'   => ['code' => 'xxx', 'description' => 'xxx desc'],
         ]);
+        $I->seeNumRecords($numOfRecords + 1, Unit::TABLE);
     }
 
     public function createUnitWithAlreadyExistCode(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
+        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
         $I->sendPOST($this->baseUrl, [
             'code'        => 'un1',
             'description' => 'duplicated',
@@ -50,6 +53,7 @@ class UnitCest
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         verify($response['data'])->hasKey('code');
+        $I->seeNumRecords($numOfRecords, Unit::TABLE);
     }
 
     public function updateUnit(ApiTester $I)
@@ -65,7 +69,12 @@ class UnitCest
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('success');
         verify('Should be able to update description.', $response['data']['description'])->equals('updated');
-        verify('Should be unable to update code.', $response['data']['code'])->notEquals('cj1');
+        verify('Should be unable to update code.', $response['data']['code'])->equals('un1');
+        $I->seeInDatabase(Unit::TABLE, [
+            'id'          => 1,
+            'code'        => 'un1',
+            'description' => 'updated',
+        ]);
     }
 
     public function updateNonExistentUnit(ApiTester $I)
