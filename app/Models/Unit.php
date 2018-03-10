@@ -17,14 +17,20 @@ class Unit extends Model
         self::SCENARIO_UPDATE => ['description'],
     ];
 
-    /** @var array */
-    public static $rules = [
-        self::SCENARIO_CREATE => [
-            'code'        => 'required',
-            'description' => 'required',
-        ],
-        self::SCENARIO_UPDATE => [],
-    ];
+    public function getRules(string $scenario): array
+    {
+        $rules = [
+            self::SCENARIO_CREATE => [
+                'code'        => 'required|unique:unit',
+                'description' => 'required',
+            ],
+            self::SCENARIO_UPDATE => [],
+        ];
+
+        return $scenario
+            ? $rules[$scenario]
+            : $rules;
+    }
 
     public function getFillable(): array
     {
