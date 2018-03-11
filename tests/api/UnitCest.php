@@ -9,12 +9,12 @@ use App\Tests\ValidationMessage;
 
 class UnitCest extends BaseCest
 {
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return '/units';
     }
 
-    public function getUnits(ApiTester $I)
+    public function testGetUnits(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
 
@@ -30,7 +30,7 @@ class UnitCest extends BaseCest
         ]);
     }
 
-    public function createUnit(ApiTester $I)
+    public function testCreateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
@@ -49,7 +49,7 @@ class UnitCest extends BaseCest
         $I->seeNumRecords($numOfRecords + 1, Unit::TABLE);
     }
 
-    public function createUnitWithMissingRequiredFields(ApiTester $I)
+    public function testCreateUnitWithMissingRequiredFields(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
@@ -67,7 +67,7 @@ class UnitCest extends BaseCest
         $I->seeNumRecords($numOfRecords, Unit::TABLE);
     }
 
-    public function createUnitWithAlreadyExistCode(ApiTester $I)
+    public function testCreateUnitWithAlreadyExistCode(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
@@ -86,7 +86,7 @@ class UnitCest extends BaseCest
         $I->seeNumRecords($numOfRecords, Unit::TABLE);
     }
 
-    public function createUnitWithTooLong(ApiTester $I)
+    public function testCreateUnitWithTooLong(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $numOfRecords = $I->grabNumRecords(Unit::TABLE);
@@ -107,7 +107,7 @@ class UnitCest extends BaseCest
         $I->seeNumRecords($numOfRecords, Unit::TABLE);
     }
 
-    public function updateUnit(ApiTester $I)
+    public function testUpdateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
 
@@ -129,7 +129,7 @@ class UnitCest extends BaseCest
         ]);
     }
 
-    public function updateUnitWithTooLong(ApiTester $I)
+    public function testUpdateUnitWithTooLong(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
 
@@ -150,7 +150,7 @@ class UnitCest extends BaseCest
         ]);
     }
 
-    public function deleteUnit(ApiTester $I)
+    public function testDeleteUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
 

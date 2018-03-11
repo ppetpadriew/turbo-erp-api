@@ -9,12 +9,12 @@ use App\Tests\ValidationMessage;
 
 class ItemTypeCest extends BaseCest
 {
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return '/item_types';
     }
 
-    public function createItemTypeWithMissingRequiredFields(ApiTester $I)
+    public function testCreateItemTypeWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
@@ -23,13 +23,14 @@ class ItemTypeCest extends BaseCest
             'nonexistence field' => 'foo',
         ]);
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         verify($response['data'])->hasKey('description');
         $I->seeNumRecords($numOfRecord, ItemType::TABLE);
     }
 
-    public function createItemType(ApiTester $I)
+    public function testCreateItemType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
@@ -49,7 +50,7 @@ class ItemTypeCest extends BaseCest
         $I->seeNumRecords($numOfRecord + 1, ItemType::TABLE);
     }
 
-    public function createItemTypeWithAlreadyExistType(ApiTester $I)
+    public function testCreateItemTypeWithAlreadyExistType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
@@ -66,7 +67,7 @@ class ItemTypeCest extends BaseCest
         $I->seeNumRecords($numOfRecord, ItemType::TABLE);
     }
 
-    public function updateItemTypeWithAlreadyExistType(ApiTester $I)
+    public function testUpdateItemTypeWithAlreadyExistType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
         $before = $I->grabRecord(ItemType::TABLE, ['id' => 1,]);
@@ -88,7 +89,7 @@ class ItemTypeCest extends BaseCest
         verify($before)->equals($after);
     }
 
-    public function updateItemTypeWithoutChangingUniqueField(ApiTester $I)
+    public function testUpdateItemTypeWithoutChangingUniqueField(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
         $before = $I->grabRecord(ItemType::TABLE, ['id' => 1]);

@@ -10,18 +10,19 @@ use App\Tests\ValidationMessage;
 
 class ItemCest extends BaseCest
 {
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return '/items';
     }
 
-    public function createItemWithMissingRequiredFields(ApiTester $I)
+    public function testCreateItemWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(Item::TABLE);
 
         $I->sendPOST($this->getBaseUrl(), []);
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         verify(array_keys($response['data']))->equals([
@@ -34,7 +35,7 @@ class ItemCest extends BaseCest
         $I->seeNumRecords($numOfRecord, Item::TABLE);
     }
 
-    public function createItemWithAlreadyExistCode(ApiTester $I)
+    public function testCreateItemWithAlreadyExistCode(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(Item::TABLE);
@@ -44,6 +45,7 @@ class ItemCest extends BaseCest
             'ean'  => '1234567890123',
         ]);
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         foreach (['code', 'ean'] as $field) {
@@ -53,7 +55,7 @@ class ItemCest extends BaseCest
         $I->seeNumRecords($numOfRecord, Item::TABLE);
     }
 
-    public function createItemWithTooLong(ApiTester $I)
+    public function tesstCreateItemWithTooLong(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(Item::TABLE);
@@ -64,6 +66,7 @@ class ItemCest extends BaseCest
             'description' => str_repeat('super long', 100),
         ]);
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         foreach (['code' => 20, 'ean' => 13, 'description' => 100] as $field => $max) {
@@ -73,7 +76,7 @@ class ItemCest extends BaseCest
         $I->seeNumRecords($numOfRecord, Item::TABLE);
     }
 
-    public function createItemWithNonExistenceReference(ApiTester $I)
+    public function testCreateItemWithNonExistenceReference(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(Item::TABLE);
@@ -84,6 +87,7 @@ class ItemCest extends BaseCest
             'weight_unit_id'    => 99,
         ]);
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         foreach (['item_type_id', 'inventory_unit_id', 'weight_unit_id'] as $field) {
@@ -93,7 +97,7 @@ class ItemCest extends BaseCest
         $I->seeNumRecords($numOfRecord, Item::TABLE);
     }
 
-    public function createItemWithInvalidFieldTypes(ApiTester $I)
+    public function testCreateItemWithInvalidFieldTypes(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $numOfRecord = $I->grabNumRecords(Item::TABLE);
@@ -103,6 +107,7 @@ class ItemCest extends BaseCest
             'lot_controlled' => 'some string',
         ]);
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         $fields = ['weight' => ValidationMessage::NUMERIC, 'lot_controlled' => ValidationMessage::BOOLEAN];
@@ -113,7 +118,7 @@ class ItemCest extends BaseCest
         $I->seeNumRecords($numOfRecord, Item::TABLE);
     }
 
-    public function updateItemWithUnFillableFields(ApiTester $I)
+    public function testUpdateItemWithUnFillableFields(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
@@ -123,22 +128,28 @@ class ItemCest extends BaseCest
             ] + $before
         );
 
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => $before,
+        ]);
         $after = $I->grabRecord(Item::TABLE, ['id' => 1]);
         verify($before)->equals($after);
     }
 
-    public function updateItemWithoutChangingUniqueField(ApiTester $I)
+    public function testUpdateItemWithoutChangingUniqueField(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
 
         $I->sendPUT("{$this->getBaseUrl()}/1", $before);
 
+        $I->seeResponseCodeIs(200);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('success');
     }
 
-    public function updateNullableFieldsWithNull(ApiTester $I)
+    public function testUpdateNullableFieldsWithNull(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
@@ -149,6 +160,7 @@ class ItemCest extends BaseCest
             ] + $before
         );
 
+        $I->seeResponseCodeIs(200);
         $I->seeResponseContainsJson([
             'status' => 'success',
             'data'   => [
@@ -162,7 +174,7 @@ class ItemCest extends BaseCest
         verify($after['description'])->null();
     }
 
-    public function updateItemWithTooLong(ApiTester $I)
+    public function testUpdateItemWithTooLong(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
@@ -173,6 +185,7 @@ class ItemCest extends BaseCest
             ] + $before
         );
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         foreach (['ean' => 13, 'description' => 100] as $field => $max) {
@@ -183,7 +196,7 @@ class ItemCest extends BaseCest
         verify($before)->equals($after);
     }
 
-    public function updateItemWithNonExistenceReference(ApiTester $I)
+    public function testUpdateItemWithNonExistenceReference(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
@@ -195,6 +208,7 @@ class ItemCest extends BaseCest
             ] + $before
         );
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         foreach (['item_type_id', 'inventory_unit_id', 'weight_unit_id'] as $field) {
@@ -205,7 +219,7 @@ class ItemCest extends BaseCest
         verify($before)->equals($after);
     }
 
-    public function updateItemWithInvalidFieldTypes(ApiTester $I)
+    public function testUpdateItemWithInvalidFieldTypes(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
@@ -216,6 +230,7 @@ class ItemCest extends BaseCest
             ] + $before
         );
 
+        $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
         $fields = ['weight' => ValidationMessage::NUMERIC, 'lot_controlled' => ValidationMessage::BOOLEAN];
