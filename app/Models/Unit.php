@@ -7,6 +7,11 @@ class Unit extends Model
 {
     const TABLE = 'unit';
 
+    public function getAttributeDefaultValues(): array
+    {
+        return [];
+    }
+
     public function getRules(string $scenario): array
     {
         $rules = [

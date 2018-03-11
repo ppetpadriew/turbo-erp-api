@@ -10,6 +10,11 @@ class ItemType extends Model
 {
     const TABLE = 'item_type';
 
+    public function getAttributeDefaultValues(): array
+    {
+        return [];
+    }
+
     public function getRules(string $scenario): array
     {
         $rules = [
