@@ -5,6 +5,7 @@ namespace App\Tests\Api;
 use ApiTester;
 use App\Database\Seeds\ItemTypeControllerSeeder;
 use App\Models\ItemType;
+use App\Tests\ValidationMessage;
 
 class ItemTypeCest extends BaseCest
 {
@@ -68,37 +69,37 @@ class ItemTypeCest extends BaseCest
     public function updateItemTypeWithAlreadyExistType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
+        $before = $I->grabRecord(ItemType::TABLE, ['id' => 1,]);
 
         $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'description' => 'type 2',
-        ]);
+                'description' => 'type 2',
+            ] + $before
+        );
 
         $I->seeResponseCodeIs(400);
         $I->seeResponseIsJson();
         $response = $I->grabJsonResponse();
         verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('description');
-        $I->seeInDatabase(ItemType::TABLE, [
-            'id'          => 1,
-            'description' => 'type 1',
-        ]);
+        foreach (['description'] as $field) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::UNIQUE, str_replace('_', ' ', $field)));
+        }
+        $after = $I->grabRecord(ItemType::TABLE, ['id' => 1,]);
+        verify($before)->equals($after);
     }
 
     public function updateItemTypeWithoutChangingUniqueField(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
+        $before = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
 
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'description' => 'type 1', // Client didn't change this but change other fields
-        ]);
+        $I->sendPUT("{$this->getBaseUrl()}/1", $before);
 
         $I->seeResponseCodeIs(200);
         $I->seeResponseIsJson();
         $I->seeResponseContainsJson([
             'status' => 'success',
-            'data'   => [
-                'description' => 'type 1',
-            ],
+            'data'   => $before,
         ]);
     }
 }
