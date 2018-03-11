@@ -7,18 +7,26 @@ use App\Models\Model;
 
 class DummyModel extends Model
 {
+    const TABLE = 'unit';
     const SCENARIO_X = 'x';
     const SCENARIO_Y = 'y';
 
-    /** @var string */
-    protected $table = 'unit';
-
-    protected $fillable = [
-        'code',
-        'description',
-    ];
-
     public function getRules(string $scenario): array
+    {
+        return [];
+    }
+
+    public function getFillable()
+    {
+        $fillable = [
+            self::SCENARIO_CREATE => ['code', 'description'],
+            self::SCENARIO_UPDATE => ['code', 'description'],
+        ];
+
+        return $fillable[$this->scenario];
+    }
+
+    public function getAttributeDefaultValues(): array
     {
         return [];
     }

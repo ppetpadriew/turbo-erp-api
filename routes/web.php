@@ -11,6 +11,8 @@
 |
 */
 
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\UnitController;
 
 $router->get('/', function () use ($router) {
@@ -18,7 +20,9 @@ $router->get('/', function () use ($router) {
 });
 
 $controllers = [
-    'units' => UnitController::class,
+    'units'      => UnitController::class,
+    'item_types' => ItemTypeController::class,
+    'items'      => ItemController::class,
 ];
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);

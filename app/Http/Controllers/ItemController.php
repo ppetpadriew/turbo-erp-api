@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\Unit;
+use App\Models\Item;
 
-class UnitController extends BaseController
+class ItemController extends BaseController
 {
     public function getModelClass(): string
     {
-        return Unit::class;
+        return Item::class;
     }
 }

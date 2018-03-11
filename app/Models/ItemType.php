@@ -3,9 +3,12 @@
 namespace App\Models;
 
 
-class Unit extends Model
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\Rule;
+
+class ItemType extends Model
 {
-    const TABLE = 'unit';
+    const TABLE = 'item_type';
 
     public function getAttributeDefaultValues(): array
     {
@@ -16,11 +19,10 @@ class Unit extends Model
     {
         $rules = [
             self::SCENARIO_CREATE => [
-                'code'        => ['required', "unique:{$this->table}", 'max:3'],
-                'description' => ['required', 'max:40'],
+                'description' => ['required', "unique:{$this->table}"],
             ],
             self::SCENARIO_UPDATE => [
-                'description' => ['max:40'],
+                'description' => Rule::unique($this->table)->ignore($this->id),
             ],
         ];
 
@@ -29,15 +31,18 @@ class Unit extends Model
             : $rules;
     }
 
-    public function getFillable(): array
+    public function getFillable()
     {
         $fillable = [
-            self::SCENARIO_CREATE => ['code', 'description'],
+            self::SCENARIO_CREATE => ['description'],
             self::SCENARIO_UPDATE => ['description'],
         ];
 
         return $fillable[$this->scenario];
     }
 
-    // Relationships
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class);
+    }
 }

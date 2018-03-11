@@ -9,10 +9,19 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class BaseController extends Controller
+abstract class BaseController extends Controller
 {
     /** @var string */
     protected $modelClass;
+
+    public function __construct()
+    {
+        if (empty($this->getModelClass())) {
+            throw new \Exception('Please define your model class in controller.');
+        }
+        
+        $this->modelClass = $this->getModelClass();
+    }
 
     public function index()
     {
@@ -26,7 +35,9 @@ class BaseController extends Controller
     public function create(Request $request)
     {
         $instance = new $this->modelClass;
-        $validator = Validator::make($request->all(), $instance->getRules($this->modelClass::SCENARIO_CREATE));
+        $validator = Validator::make(
+            $request->all() + $instance->getAttributeDefaultValues(), $instance->getRules($this->modelClass::SCENARIO_CREATE)
+        );
 
         if ($validator->fails()) {
             return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
@@ -80,4 +91,6 @@ class BaseController extends Controller
 
         return $record;
     }
+
+    abstract public function getModelClass(): string;
 }
