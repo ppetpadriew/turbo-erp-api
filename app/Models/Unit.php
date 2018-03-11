@@ -20,7 +20,7 @@ class Unit extends Model
                 'description' => ['required', 'max:40'],
             ],
             self::SCENARIO_UPDATE => [
-                'description' => ['max:40'],
+                'description' => ['required', 'max:40'],
             ],
         ];
 
