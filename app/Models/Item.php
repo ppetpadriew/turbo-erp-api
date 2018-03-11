@@ -3,7 +3,7 @@
 namespace App\Models;
 
 
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Item extends Model
 {
@@ -58,8 +58,8 @@ class Item extends Model
 
     // Relationships
 
-    public function itemType(): HasOne
+    public function itemType(): BelongsTo
     {
-        return $this->hasOne(ItemType::class);
+        return $this->belongsTo(ItemType::class);
     }
 }
