@@ -15,6 +15,70 @@ class ItemCest extends BaseCest
         return '/items';
     }
 
+    public function testGetItems(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+
+        $I->sendGET($this->getBaseUrl());
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => [
+                [
+                    'id'                => 1,
+                    'code'              => 'item-1',
+                    'ean'               => '1234567890123',
+                    'description'       => 'item-1 desc',
+                    'item_type_id'      => 1,
+                    'inventory_unit_id' => 1,
+                    'weight'            => '0',
+                    'weight_unit_id'    => 1,
+                    'lot_controlled'    => 0,
+                    'created_datetime'  => '2018-01-01 00:00:00',
+                    'updated_datetime'  => '2018-01-01 00:00:00',
+                ],
+            ],
+        ]);
+    }
+
+    public function testGetItem(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $row = $I->grabRecord(Item::TABLE, ['id' => 1]);
+
+        $I->sendGET("{$this->getBaseUrl()}/1");
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => $row,
+        ]);
+    }
+
+    public function testCreateItem(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $numOfRecord = $I->grabNumRecords(Item::TABLE);
+        $data = [
+            'code'              => 'valid-item',
+            'ean'               => '1122334455123',
+            'description'       => 'valid-item desc',
+            'item_type_id'      => 1,
+            'inventory_unit_id' => 1,
+            'weight'            => '0',
+            'weight_unit_id'    => 1,
+            'lot_controlled'    => 0,
+        ];
+
+        $I->sendPOST($this->getBaseUrl(), $data);
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => $data,
+        ]);
+        $I->seeNumRecords($numOfRecord + 1, Item::TABLE);
+    }
+
     public function testCreateItemWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
@@ -116,6 +180,50 @@ class ItemCest extends BaseCest
             verify($response['data'][$field])->contains(sprintf($message, str_replace('_', ' ', $field)));
         }
         $I->seeNumRecords($numOfRecord, Item::TABLE);
+    }
+
+    public function testUpdateItem(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $before = $I->grabRecord(Item::TABLE, ['id' => 1]);
+
+        $I->sendPUT("{$this->getBaseUrl()}/1", [
+                'ean'               => '1234567890124',
+                'description'       => 'item-1 updated',
+                'item_type_id'      => 2,
+                'inventory_unit_id' => 2,
+                'weight'            => '20',
+                'weight_unit_id'    => 2,
+                'lot_controlled'    => 1,
+            ]
+        );
+
+        $I->seeResponseCodeIs(200);
+        $after = $I->grabRecord(Item::TABLE, ['id' => 1]);
+        $I->seeResponseContainsJson([
+            'status' => 'success',
+            'data'   => $after,
+        ]);
+        verify($before)->notEquals($after);
+        verify($after['ean'])->equals('1234567890124');
+        verify($after['description'])->equals('item-1 updated');
+        verify($after['item_type_id'])->equals(2);
+        verify($after['inventory_unit_id'])->equals(2);
+        verify($after['weight'])->equals(20);
+        verify($after['weight_unit_id'])->equals(2);
+        verify($after['lot_controlled'])->equals(1);
+    }
+
+    public function testUpdateItemWithMissingRequiredFields(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $this->testUpdateMissingRequiredFields(
+            $I,
+            Item::TABLE,
+            "{$this->getBaseUrl()}/1",
+            ['item_type_id', 'inventory_unit_id', 'weight', 'weight_unit_id', 'lot_controlled'],
+            1
+        );
     }
 
     public function testUpdateItemWithUnFillableFields(ApiTester $I)
@@ -240,5 +348,11 @@ class ItemCest extends BaseCest
         }
         $after = $I->grabRecord(Item::TABLE, ['id' => 1]);
         verify($before)->equals($after);
+    }
+
+    public function testDeleteItem(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $this->testDelete($I, Item::TABLE, "{$this->getBaseUrl()}/1", 1);
     }
 }

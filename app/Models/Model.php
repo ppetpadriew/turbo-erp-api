@@ -25,6 +25,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
     const CREATED_AT = 'created_datetime';
     const UPDATED_AT = 'updated_datetime';
 
+    /**
+     * Model constructor.
+     * @param array $attributes
+     * @throws \Exception
+     */
     public function __construct(array $attributes = [])
     {
         if (empty(static::TABLE)) {
@@ -35,6 +40,9 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         parent::__construct($attributes);
     }
 
+    /**
+     * @param string $scenario
+     */
     public function setScenario(string $scenario): void
     {
         if (!$this->isValidScenario($scenario)) {
@@ -44,11 +52,18 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         $this->scenario = $scenario;
     }
 
+    /**
+     * @param string $scenario
+     * @return bool
+     */
     public function isValidScenario(string $scenario): bool
     {
         return in_array($scenario, $this->getScenarios());
     }
 
+    /**
+     * @return array
+     */
     public function getScenarios(): array
     {
         if ($this->scenarios) {
@@ -85,7 +100,14 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         return $model;
     }
 
+    /**
+     * @param string $scenario
+     * @return array
+     */
     abstract public function getRules(string $scenario): array;
 
+    /**
+     * @return array
+     */
     abstract public function getAttributeDefaultValues(): array;
 }

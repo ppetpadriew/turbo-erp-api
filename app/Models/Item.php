@@ -53,11 +53,11 @@ class Item extends Model
             self::SCENARIO_UPDATE => [
                 'ean'               => ['nullable', 'max:13', Rule::unique($this->table)->ignore($this->id)],
                 'description'       => ['nullable', 'max:100'],
-                'item_type_id'      => ['exists:' . ItemType::TABLE . ',id'],
-                'inventory_unit_id' => ['exists:' . Unit::TABLE . ',id'],
-                'weight'            => ['numeric'],
-                'weight_unit_id'    => ['exists:' . Unit::TABLE . ',id'],
-                'lot_controlled'    => ['boolean'],
+                'item_type_id'      => ['required', 'exists:' . ItemType::TABLE . ',id'],
+                'inventory_unit_id' => ['required', 'exists:' . Unit::TABLE . ',id'],
+                'weight'            => ['required', 'numeric'],
+                'weight_unit_id'    => ['required', 'exists:' . Unit::TABLE . ',id'],
+                'lot_controlled'    => ['required', 'boolean'],
             ],
         ];
 

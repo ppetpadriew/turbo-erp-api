@@ -6,6 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
+/**
+ * Class ItemType
+ * @package App\Models
+ *
+ * @property int $id
+ * @property string $description
+ */
 class ItemType extends Model
 {
     const TABLE = 'item_type';
@@ -22,7 +29,7 @@ class ItemType extends Model
                 'description' => ['required', "unique:{$this->table}"],
             ],
             self::SCENARIO_UPDATE => [
-                'description' => Rule::unique($this->table)->ignore($this->id),
+                'description' => ['required', Rule::unique($this->table)->ignore($this->id)],
             ],
         ];
 
@@ -41,6 +48,9 @@ class ItemType extends Model
         return $fillable[$this->scenario];
     }
 
+    /**
+     * @return HasMany
+     */
     public function items(): HasMany
     {
         return $this->hasMany(Item::class);
