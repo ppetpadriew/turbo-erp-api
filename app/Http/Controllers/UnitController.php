@@ -7,5 +7,8 @@ use App\Models\Unit;
 
 class UnitController extends BaseController
 {
-    protected $modelClass = Unit::class;
+    public function getModelClass(): string
+    {
+        return Unit::class;
+    }
 }
