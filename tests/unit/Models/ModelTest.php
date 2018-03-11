@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Models;
 
 use App\Tests\DummyModel;
+use App\Tests\EmptyTableModel;
 use App\Tests\Unit\Unit;
 
 class ModelTest extends Unit
@@ -38,6 +39,15 @@ class ModelTest extends Unit
     {
         $this->specify('It should throw an exception when calling.', function () {
             (new DummyModel)->fillable([]);
+        }, [
+            'throws' => \Exception::class,
+        ]);
+    }
+
+    public function testConstruct()
+    {
+        $this->specify('It should throw an exception when TABLE constant is empty.', function () {
+            new EmptyTableModel;
         }, [
             'throws' => \Exception::class,
         ]);

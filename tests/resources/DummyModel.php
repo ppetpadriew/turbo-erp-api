@@ -25,4 +25,9 @@ class DummyModel extends Model
 
         return $fillable[$this->scenario];
     }
+
+    public function getAttributeDefaultValues(): array
+    {
+        return [];
+    }
 }
