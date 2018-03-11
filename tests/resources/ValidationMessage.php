@@ -14,4 +14,7 @@ class ValidationMessage
     const UNIQUE = 'The %s has already been taken.';
     const MAX_STRING = 'The %s may not be greater than %s characters.';
     const REQUIRED = 'The %s field is required.';
+    const EXIST = 'The selected %s is invalid.';
+    const NUMERIC = 'The %s must be a number.';
+    const BOOLEAN = 'The %s field must be true or false.';
 }
