@@ -14,6 +14,7 @@ class ItemControllerSeeder extends Seeder
             [
                 'id'                => 1,
                 'code'              => 'item-1',
+                'ean'               => '1234567890123',
                 'description'       => 'item-1 desc',
                 'item_type_id'      => 1,
                 'inventory_unit_id' => 1,
