@@ -30,6 +30,20 @@ class UnitCest extends BaseCest
         ]);
     }
 
+    public function testGetUnit(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $row = $I->grabRecord(Unit::TABLE, ['id' => 1]);
+
+        $I->sendGET("{$this->getBaseUrl()}/1");
+
+        $I->seeResponseCodeIs(200);
+        $I->seeResponseJsonEquals([
+            'status' => 'success',
+            'data'   => $row,
+        ]);
+    }
+
     public function testCreateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();

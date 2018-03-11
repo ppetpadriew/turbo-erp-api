@@ -27,6 +27,7 @@ $controllers = [
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);
     $router->get("/{$resource}", "{$baseName}@index");
+    $router->get("/{$resource}/{id}", "{$baseName}@get");
     $router->post("/{$resource}", "{$baseName}@create");
     $router->put("/{$resource}/{id}", "{$baseName}@update");
     $router->delete("/{$resource}/{id}", "{$baseName}@delete");
