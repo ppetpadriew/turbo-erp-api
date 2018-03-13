@@ -59,7 +59,7 @@ abstract class BaseController extends Controller
             return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->modelClass::create($request->toArray());
+        return $this->modelClass::create($request->toArray())->fresh();
     }
 
     /**

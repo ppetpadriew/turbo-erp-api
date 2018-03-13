@@ -124,77 +124,30 @@ class UnitCest extends BaseCest
     public function testUpdateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $before = $I->grabRecord(Unit::TABLE, ['id' => 1]);
+        $this->testUpdate($I, Unit::TABLE, ['description' => 'updated',], 1);
+    }
 
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'code'        => 'cj1',
-            'description' => 'updated',
-        ]);
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('success');
-        $after = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-        verify($before)->notEquals($after);
-        verify('Should be unable to update code.', $after['code'])->notEquals('cj1');
-        verify('Should be able to update description.', $after['description'])->equals('updated');
-        verify($response['data'])->equals($after);
+    public function testUpdateUnitWithUnfillableFields(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $this->testUpdateWithUnfillableFields($I, Unit::TABLE, ['code' => 'cj1'], 1);
     }
 
     public function testUpdateUnitWithTooLong(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $before = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'description' => 'super long unit' . str_repeat('x', 40),
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        foreach (['description' => 40] as $field => $max) {
-            verify($response['data'])->hasKey($field);
-            verify($response['data'][$field])->contains(sprintf(ValidationMessage::MAX_STRING, str_replace('_', ' ', $field), $max));
-        }
-        $after = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-        verify($before)->equals($after);
+        $this->testUpdateWithTooLong($I, Unit::TABLE, ['description' => 40], 1);
     }
 
     public function testUpdateUnitWithMissingRequiredFields(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $before = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-
-        $I->sendPUT("{$this->getBaseUrl()}/1", []);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        foreach (['description'] as $field) {
-            verify($response['data'])->hasKey($field);
-            verify($response['data'][$field])->contains(sprintf(ValidationMessage::REQUIRED, str_replace('_', ' ', $field)));
-        }
-        $after = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-        verify($before)->equals($after);
+        $this->testUpdateWithMissingRequiredFields($I, Unit::TABLE, ['description'], 1);
     }
 
     public function testDeleteUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $before = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-
-        $I->sendDELETE("{$this->getBaseUrl()}/1");
-
-        $I->seeResponseCodeIs(200);
-        $I->dontSeeInDatabase(Unit::TABLE, $before);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => $before,
-        ]);
+        $this->testDelete($I, Unit::TABLE, 1);
     }
 }

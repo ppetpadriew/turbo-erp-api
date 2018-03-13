@@ -102,40 +102,13 @@ class ItemTypeCest extends BaseCest
     public function testUpdateItemType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $before = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
-
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-                'description' => 'type 99',
-            ] + $before
-        );
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('success');
-        $after = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
-        verify($before)->notEquals($after);
-        verify($after['description'])->equals('type 99');
-        verify($response['data'])->equals($after);
+        $this->testUpdate($I, ItemType::TABLE, ['description' => 'type 99'], 1);
     }
 
     public function testUpdateItemTypeWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $before = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
-
-        $I->sendPUT("{$this->getBaseUrl()}/1", []);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        foreach (['description'] as $field) {
-            verify($response['data'])->hasKey($field);
-            verify($response['data'][$field])->contains(sprintf(ValidationMessage::REQUIRED, str_replace('_', ' ', $field)));
-        }
-        $after = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
-        verify($before)->equals($after);
+        $this->testUpdateWithMissingRequiredFields($I, ItemType::TABLE, ['description'], 1);
     }
 
     public function testUpdateItemTypeWithAlreadyExistType(ApiTester $I)
@@ -163,31 +136,18 @@ class ItemTypeCest extends BaseCest
     public function testUpdateItemTypeWithoutChangingUniqueField(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $before = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
+        $this->testUpdateWithoutChangingUniqueFields($I, ItemType::TABLE, 1);
+    }
 
-        $I->sendPUT("{$this->getBaseUrl()}/1", $before);
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => $before,
-        ]);
+    public function testUpdateItemTypeWithTooLong(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testUpdateWithTooLong($I, ItemType::TABLE, ['description' => 30], 1);
     }
 
     public function testDeleteItemType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $before = $I->grabRecord(ItemType::TABLE, ['id' => 1]);
-
-        $I->sendDELETE("{$this->getBaseUrl()}/1");
-
-        $I->seeResponseCodeIs(200);
-        $I->dontSeeInDatabase(ItemType::TABLE, $before);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => $before,
-        ]);
+        $this->testDelete($I, ItemType::TABLE, 1);
     }
 }

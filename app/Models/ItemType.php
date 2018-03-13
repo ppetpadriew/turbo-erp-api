@@ -26,10 +26,10 @@ class ItemType extends Model
     {
         $rules = [
             self::SCENARIO_CREATE => [
-                'description' => ['required', "unique:{$this->table}"],
+                'description' => ['required', 'max:30', "unique:{$this->table}"],
             ],
             self::SCENARIO_UPDATE => [
-                'description' => ['required', Rule::unique($this->table)->ignore($this->id)],
+                'description' => ['required', 'max:30', Rule::unique($this->table)->ignore($this->id)],
             ],
         ];
 
