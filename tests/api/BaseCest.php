@@ -52,7 +52,7 @@ abstract class BaseCest
         ]);
     }
 
-    protected function testCreate(ApiTester $I, string $table, array $fields, array $defaultFields)
+    protected function testCreate(ApiTester $I, string $table, array $fields, array $defaultFields = [])
     {
         $numOfRecord = $I->grabNumRecords($table);
 
@@ -117,7 +117,7 @@ abstract class BaseCest
      * @param string $table
      * @param array $fields
      */
-    protected function createWithMissingRequiredFields(ApiTester $I, string $table, array $fields)
+    protected function testCreateWithMissingRequiredFields(ApiTester $I, string $table, array $fields)
     {
         $numOfRecord = $I->grabNumRecords($table);
 
@@ -151,6 +151,28 @@ abstract class BaseCest
         foreach ($fields as $field) {
             verify($response['data'])->hasKey($field);
             verify($response['data'][$field])->contains(sprintf(ValidationMessage::EXIST, str_replace('_', ' ', $field)));
+        }
+        $I->seeNumRecords($numOfRecord, $table);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
+     * @param $expected
+     */
+    protected function testCreateWithInvalidFieldTypes(ApiTester $I, string $table, array $fields, array $messages)
+    {
+        $numOfRecord = $I->grabNumRecords($table);
+
+        $I->sendPOST($this->getBaseUrl(), $fields);
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($messages as $field => $message) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf($message, str_replace('_', ' ', $field)));
         }
         $I->seeNumRecords($numOfRecord, $table);
     }
@@ -333,6 +355,30 @@ abstract class BaseCest
             'status' => 'success',
             'data'   => $before,
         ]);
+        $after = $I->grabRecord($table, ['id' => $id]);
+        verify($before)->equals($after);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
+     * @param int $id
+     */
+    protected function testUpdateWithAlreadyExist(ApiTester $I, string $table, array $fields, int $id)
+    {
+        $before = $I->grabRecord($table, ['id' => $id]);
+
+        $I->sendPUT("{$this->getBaseUrl()}/1", $fields + $before);
+
+        $I->seeResponseCodeIs(400);
+        $I->seeResponseIsJson();
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field => $value) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::UNIQUE, str_replace('_', ' ', $field)));
+        }
         $after = $I->grabRecord($table, ['id' => $id]);
         verify($before)->equals($after);
     }

@@ -40,7 +40,7 @@ class ItemCest extends BaseCest
             'weight_unit_id'    => 1,
             'lot_controlled'    => 1,
         ];
-        $this->testCreate($I, Item::TABLE, $data, []);
+        $this->testCreate($I, Item::TABLE, $data);
     }
 
     public function testCreateItemWithDefaultValues(ApiTester $I)
@@ -61,7 +61,7 @@ class ItemCest extends BaseCest
     public function testCreateItemWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
-        $this->createWithMissingRequiredFields($I, Item::TABLE, [
+        $this->testCreateWithMissingRequiredFields($I, Item::TABLE, [
             'code',
             'item_type_id',
             'inventory_unit_id',
@@ -94,22 +94,11 @@ class ItemCest extends BaseCest
     public function testCreateItemWithInvalidFieldTypes(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
-        $numOfRecord = $I->grabNumRecords(Item::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
+        $messages = ['weight' => ValidationMessage::NUMERIC, 'lot_controlled' => ValidationMessage::BOOLEAN];
+        $this->testCreateWithInvalidFieldTypes($I, Item::TABLE, [
             'weight'         => 'some string',
             'lot_controlled' => 'some string',
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        $fields = ['weight' => ValidationMessage::NUMERIC, 'lot_controlled' => ValidationMessage::BOOLEAN];
-        foreach ($fields as $field => $message) {
-            verify($response['data'])->hasKey($field);
-            verify($response['data'][$field])->contains(sprintf($message, str_replace('_', ' ', $field)));
-        }
-        $I->seeNumRecords($numOfRecord, Item::TABLE);
+        ], $messages);
     }
 
     public function testUpdateItem(ApiTester $I)

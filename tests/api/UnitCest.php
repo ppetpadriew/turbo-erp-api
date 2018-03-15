@@ -5,7 +5,6 @@ namespace App\Tests\Api;
 use ApiTester;
 use App\Database\Seeds\UnitControllerSeeder;
 use App\Models\Unit;
-use App\Tests\ValidationMessage;
 
 class UnitCest extends BaseCest
 {
@@ -14,111 +13,45 @@ class UnitCest extends BaseCest
         return '/units';
     }
 
-    public function testGetUnits(ApiTester $I)
+    public function testListUnits(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-
-        $I->sendGET($this->getBaseUrl());
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseJsonEquals([
-            'status' => 'success',
-            'data'   => [
-                ['id' => 1, 'code' => 'un1', 'description' => 'un1 desc'],
-                ['id' => 2, 'code' => 'un2', 'description' => 'un2 desc'],
-            ],
-        ]);
+        $this->testList($I, Unit::TABLE);
     }
 
     public function testGetUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $row = $I->grabRecord(Unit::TABLE, ['id' => 1]);
-
-        $I->sendGET("{$this->getBaseUrl()}/1");
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseJsonEquals([
-            'status' => 'success',
-            'data'   => $row,
-        ]);
+        $this->testGet($I, Unit::TABLE, 1);
     }
 
     public function testCreateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
+        $this->testCreate($I, Unit::TABLE, [
             'code'        => 'xxx',
             'description' => 'xxx desc',
         ]);
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => ['code' => 'xxx', 'description' => 'xxx desc'],
-        ]);
-        $I->seeNumRecords($numOfRecords + 1, Unit::TABLE);
     }
 
     public function testCreateUnitWithMissingRequiredFields(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), []);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('code');
-        verify($response['data']['code'])->contains(sprintf(ValidationMessage::REQUIRED, 'code'));
-        verify($response['data'])->hasKey('description');
-        verify($response['data']['description'])->contains(sprintf(ValidationMessage::REQUIRED, 'description'));
-        $I->seeNumRecords($numOfRecords, Unit::TABLE);
+        $this->testCreateWithMissingRequiredFields($I, Unit::TABLE, ['code', 'description']);
     }
 
     public function testCreateUnitWithAlreadyExistCode(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
-            'code'        => 'un1',
-            'description' => 'duplicated',
+        $this->testCreateWithAlreadyExist($I, Unit::TABLE, [
+            'code' => 'un1',
         ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('code');
-        verify($response['data']['code'])->contains(sprintf(ValidationMessage::UNIQUE, 'code'));
-        $I->seeNumRecords($numOfRecords, Unit::TABLE);
     }
 
     public function testCreateUnitWithTooLong(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
-            'code'        => 'way too long unit code',
-            'description' => 'super long unit' . str_repeat('x', 40),
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('code');
-        verify($response['data']['code'])->contains(sprintf(ValidationMessage::MAX_STRING, 'code', '3'));
-        verify($response['data'])->hasKey('description');
-        verify($response['data']['description'])->contains(sprintf(ValidationMessage::MAX_STRING, 'description', '40'));
-        $I->seeNumRecords($numOfRecords, Unit::TABLE);
+        $this->testCreateWithTooLong($I, Unit::TABLE, ['code' => 3, 'description' => 40]);
     }
 
     public function testUpdateUnit(ApiTester $I)
