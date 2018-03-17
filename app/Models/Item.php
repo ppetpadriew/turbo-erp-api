@@ -23,9 +23,6 @@ class Item extends Model
 {
     const TABLE = 'item';
 
-    /**
-     * @return array
-     */
     public function getAttributeDefaultValues(): array
     {
         return [
@@ -33,10 +30,6 @@ class Item extends Model
         ];
     }
 
-    /**
-     * @param string $scenario
-     * @return array
-     */
     public function getRules(string $scenario): array
     {
         $rules = [
