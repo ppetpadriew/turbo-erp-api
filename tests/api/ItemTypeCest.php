@@ -8,97 +8,80 @@ use App\Models\ItemType;
 
 class ItemTypeCest extends BaseCest
 {
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return '/item_types';
     }
 
-    public function createItemTypeWithMissingRequiredFields(ApiTester $I)
+    public function testListItemTypes(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
-            'nonexistence field' => 'foo',
-        ]);
-
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('description');
-        $I->seeNumRecords($numOfRecord, ItemType::TABLE);
+        $this->testList($I, ItemType::TABLE);
     }
 
-    public function createItemType(ApiTester $I)
+    public function testGetItemType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
+        $this->testGet($I, ItemType::TABLE, 1);
+    }
 
-        $I->sendPOST($this->getBaseUrl(), [
+    public function testCreateItemType(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testCreate($I, ItemType::TABLE, [
             'description' => 'type 99',
         ]);
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => [
-                'description' => 'type 99',
-            ],
-        ]);
-        $I->seeNumRecords($numOfRecord + 1, ItemType::TABLE);
     }
 
-    public function createItemTypeWithAlreadyExistType(ApiTester $I)
+    public function testCreateItemTypeWithMissingRequiredFields(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
-        $numOfRecord = $I->grabNumRecords(ItemType::TABLE);
+        $this->testCreateWithMissingRequiredFields($I, ItemType::TABLE, ['description']);
+    }
 
-        $I->sendPOST($this->getBaseUrl(), [
+    public function testCreateItemTypeWithAlreadyExistType(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testCreateWithAlreadyExist($I, ItemType::TABLE, [
             'description' => 'type 1',
         ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('description');
-        $I->seeNumRecords($numOfRecord, ItemType::TABLE);
     }
 
-    public function updateItemTypeWithAlreadyExistType(ApiTester $I)
+    public function testUpdateItemType(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
+        $this->testUpdate($I, ItemType::TABLE, ['description' => 'type 99'], 1);
+    }
 
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
+    public function testUpdateItemTypeWithMissingRequiredFields(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testUpdateWithMissingRequiredFields($I, ItemType::TABLE, ['description'], 1);
+    }
+
+    public function testUpdateItemTypeWithAlreadyExistType(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testUpdateWithAlreadyExist($I, ItemType::TABLE, [
             'description' => 'type 2',
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('description');
-        $I->seeInDatabase(ItemType::TABLE, [
-            'id'          => 1,
-            'description' => 'type 1',
-        ]);
+        ], 1);
     }
 
-    public function updateItemTypeWithoutChangingUniqueField(ApiTester $I)
+    public function testUpdateItemTypeWithoutChangingUniqueField(ApiTester $I)
     {
         (new ItemTypeControllerSeeder)->run();
+        $this->testUpdateWithoutChangingUniqueFields($I, ItemType::TABLE, 1);
+    }
 
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'description' => 'type 1', // Client didn't change this but change other fields
-        ]);
+    public function testUpdateItemTypeWithTooLong(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testUpdateWithTooLong($I, ItemType::TABLE, ['description' => 30], 1);
+    }
 
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => [
-                'description' => 'type 1',
-            ],
-        ]);
+    public function testDeleteItemType(ApiTester $I)
+    {
+        (new ItemTypeControllerSeeder)->run();
+        $this->testDelete($I, ItemType::TABLE, 1);
     }
 }

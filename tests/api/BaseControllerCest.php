@@ -12,12 +12,12 @@ use App\Database\Seeds\UnitControllerSeeder;
  */
 class BaseControllerCest extends BaseCest
 {
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return '/units';
     }
 
-    public function deleteNonExistentUnit(ApiTester $I)
+    public function testDeleteNonExistentUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $I->sendDELETE("{$this->getBaseUrl()}/99");
@@ -28,7 +28,7 @@ class BaseControllerCest extends BaseCest
         ]);
     }
 
-    public function updateNonExistentUnit(ApiTester $I)
+    public function testUpdateNonExistenceResource(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
         $I->sendPUT("{$this->getBaseUrl()}/99", [

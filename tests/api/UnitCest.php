@@ -5,163 +5,82 @@ namespace App\Tests\Api;
 use ApiTester;
 use App\Database\Seeds\UnitControllerSeeder;
 use App\Models\Unit;
-use App\Tests\ValidationMessage;
 
 class UnitCest extends BaseCest
 {
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return '/units';
     }
 
-    public function getUnits(ApiTester $I)
+    public function testListUnits(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-
-        $I->sendGET($this->getBaseUrl());
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseJsonEquals([
-            'status' => 'success',
-            'data'   => [
-                ['id' => 1, 'code' => 'un1', 'description' => 'un1 desc'],
-                ['id' => 2, 'code' => 'un2', 'description' => 'un2 desc'],
-            ],
-        ]);
+        $this->testList($I, Unit::TABLE);
     }
 
-    public function createUnit(ApiTester $I)
+    public function testGetUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
+        $this->testGet($I, Unit::TABLE, 1);
+    }
 
-        $I->sendPOST($this->getBaseUrl(), [
+    public function testCreateUnit(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $this->testCreate($I, Unit::TABLE, [
             'code'        => 'xxx',
             'description' => 'xxx desc',
         ]);
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => ['code' => 'xxx', 'description' => 'xxx desc'],
-        ]);
-        $I->seeNumRecords($numOfRecords + 1, Unit::TABLE);
     }
 
-    public function createUnitWithMissingRequiredFields(ApiTester $I)
+    public function testCreateUnitWithMissingRequiredFields(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), []);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('code');
-        verify($response['data']['code'])->contains(sprintf(ValidationMessage::REQUIRED, 'code'));
-        verify($response['data'])->hasKey('description');
-        verify($response['data']['description'])->contains(sprintf(ValidationMessage::REQUIRED, 'description'));
-        $I->seeNumRecords($numOfRecords, Unit::TABLE);
+        $this->testCreateWithMissingRequiredFields($I, Unit::TABLE, ['code', 'description']);
     }
 
-    public function createUnitWithAlreadyExistCode(ApiTester $I)
+    public function testCreateUnitWithAlreadyExistCode(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
-            'code'        => 'un1',
-            'description' => 'duplicated',
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('code');
-        verify($response['data']['code'])->contains(sprintf(ValidationMessage::UNIQUE, 'code'));
-        $I->seeNumRecords($numOfRecords, Unit::TABLE);
-    }
-
-    public function createUnitWithTooLong(ApiTester $I)
-    {
-        (new UnitControllerSeeder)->run();
-        $numOfRecords = $I->grabNumRecords(Unit::TABLE);
-
-        $I->sendPOST($this->getBaseUrl(), [
-            'code'        => 'way too long unit code',
-            'description' => 'super long unit' . str_repeat('x', 40),
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('code');
-        verify($response['data']['code'])->contains(sprintf(ValidationMessage::MAX_STRING, 'code', '3'));
-        verify($response['data'])->hasKey('description');
-        verify($response['data']['description'])->contains(sprintf(ValidationMessage::MAX_STRING, 'description', '40'));
-        $I->seeNumRecords($numOfRecords, Unit::TABLE);
-    }
-
-    public function updateUnit(ApiTester $I)
-    {
-        (new UnitControllerSeeder)->run();
-
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'code'        => 'cj1',
-            'description' => 'updated',
-        ]);
-
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('success');
-        verify('Should be able to update description.', $response['data']['description'])->equals('updated');
-        verify('Should be unable to update code.', $response['data']['code'])->equals('un1');
-        $I->seeInDatabase(Unit::TABLE, [
-            'id'          => 1,
-            'code'        => 'un1',
-            'description' => 'updated',
+        $this->testCreateWithAlreadyExist($I, Unit::TABLE, [
+            'code' => 'un1',
         ]);
     }
 
-    public function updateUnitWithTooLong(ApiTester $I)
+    public function testCreateUnitWithTooLong(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-
-        $I->sendPUT("{$this->getBaseUrl()}/1", [
-            'description' => 'super long unit' . str_repeat('x', 40),
-        ]);
-
-        $I->seeResponseCodeIs(400);
-        $I->seeResponseIsJson();
-        $response = $I->grabJsonResponse();
-        verify($response['status'])->equals('fail');
-        verify($response['data'])->hasKey('description');
-        verify($response['data']['description'])->contains(sprintf(ValidationMessage::MAX_STRING, 'description', '40'));
-        $I->seeInDatabase(Unit::TABLE, [
-            'id'          => 1,
-            'code'        => 'un1',
-            'description' => 'un1 desc',
-        ]);
+        $this->testCreateWithTooLong($I, Unit::TABLE, ['code' => 3, 'description' => 40]);
     }
 
-    public function deleteUnit(ApiTester $I)
+    public function testUpdateUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
+        $this->testUpdate($I, Unit::TABLE, ['description' => 'updated',], 1);
+    }
 
-        $I->sendDELETE("{$this->getBaseUrl()}/1");
+    public function testUpdateUnitWithUnfillableFields(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $this->testUpdateWithUnfillableFields($I, Unit::TABLE, ['code' => 'cj1'], 1);
+    }
 
-        $I->seeResponseCodeIs(200);
-        $I->dontSeeInDatabase(Unit::TABLE, ['id' => 1]);
-        $I->seeResponseIsJson();
-        $I->seeResponseContainsJson([
-            'status' => 'success',
-            'data'   => ['id' => 1, 'description' => 'un1 desc'],
-        ]);
+    public function testUpdateUnitWithTooLong(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $this->testUpdateWithTooLong($I, Unit::TABLE, ['description' => 40], 1);
+    }
+
+    public function testUpdateUnitWithMissingRequiredFields(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $this->testUpdateWithMissingRequiredFields($I, Unit::TABLE, ['description'], 1);
+    }
+
+    public function testDeleteUnit(ApiTester $I)
+    {
+        (new UnitControllerSeeder)->run();
+        $this->testDelete($I, Unit::TABLE, 1);
     }
 }

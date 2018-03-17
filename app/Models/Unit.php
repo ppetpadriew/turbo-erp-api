@@ -2,7 +2,14 @@
 
 namespace App\Models;
 
-
+/**
+ * Class Unit
+ * @package App\Models
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $description
+ */
 class Unit extends Model
 {
     const TABLE = 'unit';
@@ -20,7 +27,7 @@ class Unit extends Model
                 'description' => ['required', 'max:40'],
             ],
             self::SCENARIO_UPDATE => [
-                'description' => ['max:40'],
+                'description' => ['required', 'max:40'],
             ],
         ];
 

@@ -11,6 +11,10 @@
 |
 */
 
+use App\Constants\Service;
+use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Events\Dispatcher;
+
 if (!$basePath = realpath(__DIR__ . '/../')) {
     throw new \Exception('Your base path configuration is not correct.');
 }
@@ -19,6 +23,14 @@ $app = new \App\Application($basePath);
 $app->withFacades();
 
 $app->withEloquent();
+
+// Change PDO fetch mode. Since Laravel does not allow to change this via config anymore.
+$dispatcher = new Dispatcher();
+$dispatcher->listen(StatementPrepared::class, function ($event) {
+    $event->statement->setFetchMode(PDO::FETCH_ASSOC);
+});
+
+$app->make(Service::DB)->setEventDispatcher($dispatcher);
 
 /*
 |--------------------------------------------------------------------------

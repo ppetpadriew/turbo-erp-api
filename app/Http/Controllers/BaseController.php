@@ -19,13 +19,29 @@ abstract class BaseController extends Controller
         if (empty($this->getModelClass())) {
             throw new \Exception('Please define your model class in controller.');
         }
-        
+
         $this->modelClass = $this->getModelClass();
     }
 
     public function index()
     {
         return $this->modelClass::all();
+    }
+
+    /**
+     * @param int $id
+     * @return Model
+     */
+    public function get(int $id)
+    {
+        /** @var Model $record */
+        $record = $this->modelClass::find($id);
+
+        if (empty($record)) {
+            throw new HttpException(404, 'Record not found.');
+        }
+
+        return $record;
     }
 
     /**
@@ -43,7 +59,7 @@ abstract class BaseController extends Controller
             return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->modelClass::create($request->toArray());
+        return $this->modelClass::create($request->toArray())->fresh();
     }
 
     /**
