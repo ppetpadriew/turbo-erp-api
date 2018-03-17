@@ -2,7 +2,14 @@
 
 namespace App\Models;
 
-
+/**
+ * Class Unit
+ * @package App\Models
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $description
+ */
 class Unit extends Model
 {
     const TABLE = 'unit';
