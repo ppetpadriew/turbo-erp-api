@@ -14,6 +14,7 @@
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\WarehouseController;
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
@@ -23,6 +24,7 @@ $controllers = [
     'units'      => UnitController::class,
     'item_types' => ItemTypeController::class,
     'items'      => ItemController::class,
+    'warehouses' => WarehouseController::class,
 ];
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);
