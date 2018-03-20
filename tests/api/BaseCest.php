@@ -200,6 +200,22 @@ abstract class BaseCest
         $I->seeNumRecords($numOfRecord, $table);
     }
 
+    protected function testCreateWithInvalidEnumFields(ApiTester $I, string $table, array $fields)
+    {
+        $numOfRecord = $I->grabNumRecords($table);
+
+        $I->sendPOST($this->getBaseUrl(), array_fill_keys($fields, 'xxxxxxxxxxxx'));
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::IN, str_replace('_', ' ', $field)));
+        }
+        $I->seeNumRecords($numOfRecord, $table);
+    }
+
     /**
      * @param ApiTester $I
      * @param string $table
@@ -401,6 +417,29 @@ abstract class BaseCest
         foreach ($fields as $field => $value) {
             verify($response['data'])->hasKey($field);
             verify($response['data'][$field])->contains(sprintf(ValidationMessage::UNIQUE, str_replace('_', ' ', $field)));
+        }
+        $after = $I->grabRecord($table, ['id' => $id]);
+        verify($before)->equals($after);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
+     * @param int $id
+     */
+    protected function testUpdateWithInvalidEnumFields(ApiTester $I, string $table, array $fields, int $id)
+    {
+        $before = $I->grabRecord($table, ['id' => $id]);
+
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", array_fill_keys($fields, 'xxxxxxxx') + $before);
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::IN, str_replace('_', ' ', $field)));
         }
         $after = $I->grabRecord($table, ['id' => $id]);
         verify($before)->equals($after);

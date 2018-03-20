@@ -17,12 +17,6 @@ class ItemControllerSeeder extends Seeder
             ['id' => 2, 'code' => 'un2', 'description' => 'un2 desc'],
         ]);
 
-        $this->db->table(ItemType::TABLE)->delete();
-        $this->db->table(ItemType::TABLE)->insert([
-            ['id' => 1, 'description' => 'type 1'],
-            ['id' => 2, 'description' => 'type 2'],
-        ]);
-
         $this->db->table(Item::TABLE)->delete();
         $this->db->table(Item::TABLE)->insert([
             [
@@ -30,7 +24,7 @@ class ItemControllerSeeder extends Seeder
                 'code'              => 'item-1',
                 'ean'               => '1234567890123',
                 'description'       => 'item-1 desc',
-                'item_type_id'      => 1,
+                'item_type'         => Item::ITEM_TYPE_PURCHASED,
                 'inventory_unit_id' => 1,
                 'weight'            => '0',
                 'weight_unit_id'    => 1,

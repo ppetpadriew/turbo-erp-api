@@ -17,4 +17,5 @@ class ValidationMessage
     const EXIST = 'The selected %s is invalid.';
     const NUMERIC = 'The %s must be a number.';
     const BOOLEAN = 'The %s field must be true or false.';
+    const IN = 'The selected %s is invalid.';
 }

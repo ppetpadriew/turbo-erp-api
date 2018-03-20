@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
  * @property int $id
  * @property string $code
  * @property string $ean
- * @property int $item_type_id
+ * @property string $item_type
  * @property int $inventory_unit_id
  * @property double $weight
  * @property int $weight_unit_id
@@ -22,6 +22,12 @@ use Illuminate\Validation\Rule;
 class Item extends Model
 {
     const TABLE = 'item';
+    const ITEM_TYPE_PURCHASED = 'Purchased';
+    const ITEM_TYPE_MANUFACTURED = 'Manufactured';
+    const ITEM_TYPES = [
+        self::ITEM_TYPE_PURCHASED,
+        self::ITEM_TYPE_MANUFACTURED,
+    ];
 
     public function getAttributeDefaultValues(): array
     {
@@ -37,7 +43,7 @@ class Item extends Model
                 'code'              => ['required', 'max:20', "unique:{$this->table}"],
                 'ean'               => ['nullable', 'max:13', "unique:{$this->table}"],
                 'description'       => ['nullable', 'max:100'],
-                'item_type_id'      => ['required', 'exists:' . ItemType::TABLE . ',id'],
+                'item_type'         => ['required', Rule::in(self::ITEM_TYPES)],
                 'inventory_unit_id' => ['required', 'exists:' . Unit::TABLE . ',id'],
                 'weight'            => ['required', 'numeric'],
                 'weight_unit_id'    => ['required', 'exists:' . Unit::TABLE . ',id'],
@@ -46,7 +52,7 @@ class Item extends Model
             self::SCENARIO_UPDATE => [
                 'ean'               => ['nullable', 'max:13', Rule::unique($this->table)->ignore($this->id)],
                 'description'       => ['nullable', 'max:100'],
-                'item_type_id'      => ['required', 'exists:' . ItemType::TABLE . ',id'],
+                'item_type'         => ['required', Rule::in(self::ITEM_TYPES)],
                 'inventory_unit_id' => ['required', 'exists:' . Unit::TABLE . ',id'],
                 'weight'            => ['required', 'numeric'],
                 'weight_unit_id'    => ['required', 'exists:' . Unit::TABLE . ',id'],
@@ -66,7 +72,7 @@ class Item extends Model
                 'code',
                 'ean',
                 'description',
-                'item_type_id',
+                'item_type',
                 'inventory_unit_id',
                 'weight',
                 'weight_unit_id',
@@ -75,7 +81,7 @@ class Item extends Model
             self::SCENARIO_UPDATE => [
                 'ean',
                 'description',
-                'item_type_id',
+                'item_type',
                 'inventory_unit_id',
                 'weight',
                 'weight_unit_id',
@@ -87,12 +93,4 @@ class Item extends Model
     }
 
     // Relationships
-
-    /**
-     * @return BelongsTo
-     */
-    public function itemType(): BelongsTo
-    {
-        return $this->belongsTo(ItemType::class);
-    }
 }

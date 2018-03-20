@@ -34,7 +34,7 @@ class ItemCest extends BaseCest
             'code'              => 'valid-item',
             'ean'               => '1122334455123',
             'description'       => 'valid-item desc',
-            'item_type_id'      => 1,
+            'item_type'         => Item::ITEM_TYPE_PURCHASED,
             'inventory_unit_id' => 1,
             'weight'            => 0,
             'weight_unit_id'    => 1,
@@ -50,7 +50,7 @@ class ItemCest extends BaseCest
             'code'              => 'valid-item',
             'ean'               => '1122334455123',
             'description'       => 'valid-item desc',
-            'item_type_id'      => 1,
+            'item_type'         => Item::ITEM_TYPE_PURCHASED,
             'inventory_unit_id' => 1,
             'weight'            => 0,
             'weight_unit_id'    => 1,
@@ -63,7 +63,7 @@ class ItemCest extends BaseCest
         (new ItemControllerSeeder)->run();
         $this->testCreateWithMissingRequiredFields($I, Item::TABLE, [
             'code',
-            'item_type_id',
+            'item_type',
             'inventory_unit_id',
             'weight',
             'weight_unit_id',
@@ -88,7 +88,7 @@ class ItemCest extends BaseCest
     public function testCreateItemWithNonExistenceReference(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
-        $this->testCreateWithNonExistenceReference($I, Item::TABLE, ['item_type_id', 'inventory_unit_id', 'weight_unit_id']);
+        $this->testCreateWithNonExistenceReference($I, Item::TABLE, ['inventory_unit_id', 'weight_unit_id']);
     }
 
     public function testCreateItemWithInvalidFieldTypes(ApiTester $I)
@@ -101,13 +101,19 @@ class ItemCest extends BaseCest
         ], $messages);
     }
 
+    public function testCreateItemWithInvalidEnumFields(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $this->testCreateWithInvalidEnumFields($I, Item::TABLE, ['item_type']);
+    }
+
     public function testUpdateItem(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
         $updateData = [
             'ean'               => '1234567890124',
             'description'       => 'item-1 updated',
-            'item_type_id'      => 2,
+            'item_type'         => Item::ITEM_TYPE_MANUFACTURED,
             'inventory_unit_id' => 2,
             'weight'            => '20',
             'weight_unit_id'    => 2,
@@ -122,7 +128,7 @@ class ItemCest extends BaseCest
         $this->testUpdateWithMissingRequiredFields(
             $I,
             Item::TABLE,
-            ['item_type_id', 'inventory_unit_id', 'weight', 'weight_unit_id', 'lot_controlled'],
+            ['item_type', 'inventory_unit_id', 'weight', 'weight_unit_id', 'lot_controlled'],
             1
         );
     }
@@ -154,7 +160,7 @@ class ItemCest extends BaseCest
     public function testUpdateItemWithNonExistenceReference(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();
-        $this->testUpdateWithNonExistenceReference($I, Item::TABLE, ['item_type_id', 'inventory_unit_id', 'weight_unit_id'], 1);
+        $this->testUpdateWithNonExistenceReference($I, Item::TABLE, ['inventory_unit_id', 'weight_unit_id'], 1);
     }
 
     public function testUpdateItemWithInvalidFieldTypes(ApiTester $I)
@@ -166,6 +172,12 @@ class ItemCest extends BaseCest
         ];
         $fields = ['weight' => ValidationMessage::NUMERIC, 'lot_controlled' => ValidationMessage::BOOLEAN];
         $this->testUpdateWithInvalidFieldTypes($I, Item::TABLE, $updateData, $fields, 1);
+    }
+
+    public function testUpdateItemWithInvalidEnumFields(ApiTester $I)
+    {
+        (new ItemControllerSeeder)->run();
+        $this->testUpdateWithInvalidEnumFields($I, Item::TABLE, ['item_type'], 1);
     }
 
     public function testDeleteItem(ApiTester $I)
