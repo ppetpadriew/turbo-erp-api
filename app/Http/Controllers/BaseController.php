@@ -51,15 +51,16 @@ abstract class BaseController extends Controller
     public function create(Request $request)
     {
         $instance = new $this->modelClass;
+        $data = $request->all() + $instance->getAttributeDefaultValues();
         $validator = Validator::make(
-            $request->all() + $instance->getAttributeDefaultValues(), $instance->getRules($this->modelClass::SCENARIO_CREATE)
+            $data, $instance->getRules($this->modelClass::SCENARIO_CREATE)
         );
 
         if ($validator->fails()) {
             return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->modelClass::create($request->toArray())->fresh();
+        return $this->modelClass::create($data)->fresh();
     }
 
     /**
