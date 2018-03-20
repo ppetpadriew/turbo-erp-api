@@ -158,8 +158,31 @@ abstract class BaseCest
     /**
      * @param ApiTester $I
      * @param string $table
+     * @param array $data
+     * @param $fields
+     */
+    protected function testCreateWithNullableFields(ApiTester $I, string $table, array $data, array $fields)
+    {
+        $numOfRecord = $I->grabNumRecords($table);
+
+        $I->sendPOST("{$this->getBaseUrl()}", $data);
+
+        $I->seeResponseCodeIs(200);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('success');
+        $I->seeNumRecords($numOfRecord + 1, $table);
+        $row = $I->grabRecord($table, ['id' => $response['data']['id']]);
+        foreach ($fields as $field) {
+            verify($response['data'][$field])->null();
+            verify($row[$field])->null();
+        }
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
      * @param array $fields
-     * @param $expected
+     * @param $messages
      */
     protected function testCreateWithInvalidFieldTypes(ApiTester $I, string $table, array $fields, array $messages)
     {
@@ -187,7 +210,7 @@ abstract class BaseCest
     {
         $before = $I->grabRecord($table, ['id' => $id]);
 
-        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $fields);
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $fields + $before);
 
         $I->seeResponseCodeIs(200);
         $after = $I->grabRecord($table, ['id' => $id]);
