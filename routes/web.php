@@ -22,7 +22,6 @@ $router->get('/', function () use ($router) {
 
 $controllers = [
     'units'      => UnitController::class,
-    'item_types' => ItemTypeController::class,
     'items'      => ItemController::class,
     'warehouses' => WarehouseController::class,
 ];
