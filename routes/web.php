@@ -12,7 +12,6 @@
 */
 
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
 
