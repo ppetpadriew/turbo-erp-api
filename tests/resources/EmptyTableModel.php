@@ -7,7 +7,7 @@ use App\Models\Model;
 
 class EmptyTableModel extends Model
 {
-    public function getRules(string $scenario): array
+    public function getRules(): array
     {
         return [];
     }

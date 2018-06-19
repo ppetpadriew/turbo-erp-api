@@ -11,7 +11,7 @@ class DummyModel extends Model
     const SCENARIO_X = 'x';
     const SCENARIO_Y = 'y';
 
-    public function getRules(string $scenario): array
+    public function getRules(): array
     {
         return [];
     }
