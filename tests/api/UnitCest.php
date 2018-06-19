@@ -72,12 +72,6 @@ class UnitCest extends BaseCest
         $this->testUpdateWithTooLong($I, Unit::TABLE, ['description' => 40], 1);
     }
 
-    public function testUpdateUnitWithMissingRequiredFields(ApiTester $I)
-    {
-        (new UnitControllerSeeder)->run();
-        $this->testUpdateWithMissingRequiredFields($I, Unit::TABLE, ['description'], 1);
-    }
-
     public function testDeleteUnit(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
