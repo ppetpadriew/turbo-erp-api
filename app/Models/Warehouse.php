@@ -15,43 +15,17 @@ class Warehouse extends Model
         ];
     }
 
-    public function getRules(string $scenario): array
+    public function getRules(): array
     {
-        $rules = [
-            self::SCENARIO_CREATE => [
-                'code'                       => ['required', 'max:6', "unique:{$this->table}"],
-                'description'                => ['nullable', 'max:30'],
-                'negative_inventory_allowed' => ['required', 'boolean'],
-                'manual_adjustment_allowed'  => ['required', 'boolean'],
-            ],
-            self::SCENARIO_UPDATE => [
-                'description'                => ['nullable', 'max:30'],
-                'negative_inventory_allowed' => ['required', 'boolean'],
-                'manual_adjustment_allowed'  => ['required', 'boolean'],
-            ],
+        return [
+            ['required', ['code'], [self::SCENARIO_CREATE]],
+            ['required', ['negative_inventory_allowed', 'manual_adjustment_allowed']],
+            ["unique:{$this->table}", ['code'], [self::SCENARIO_CREATE]],
+            ['max:6', ['code'], [self::SCENARIO_CREATE]],
+            ['max:30', ['description']],
+            ['nullable', ['description']],
+            ['bool', ['negative_inventory_allowed', 'manual_adjustment_allowed']],
         ];
-
-        return $scenario
-            ? $rules[$scenario]
-            : $rules;
     }
 
-    public function getFillable()
-    {
-        $fillable = [
-            self::SCENARIO_CREATE => [
-                'code',
-                'description',
-                'negative_inventory_allowed',
-                'manual_adjustment_allowed',
-            ],
-            self::SCENARIO_UPDATE => [
-                'description',
-                'negative_inventory_allowed',
-                'manual_adjustment_allowed',
-            ],
-        ];
-
-        return $fillable[$this->scenario];
-    }
 }
