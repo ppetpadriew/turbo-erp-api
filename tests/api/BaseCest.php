@@ -251,8 +251,9 @@ abstract class BaseCest
     protected function testUpdateWithMissingRequiredFields(ApiTester $I, string $table, array $fields, int $id)
     {
         $before = $I->grabRecord($table, ['id' => $id]);
+        $updateData = array_fill_keys($fields, null);
 
-        $I->sendPUT("{$this->getBaseUrl()}/{$id}", []);
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $updateData);
 
         $I->seeResponseCodeIs(400);
         $response = $I->grabJsonResponse();
