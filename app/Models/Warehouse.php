@@ -15,7 +15,7 @@ class Warehouse extends Model
         ];
     }
 
-    public function getRules(): array
+    protected function getRules(): array
     {
         return [
             ['required', ['code'], [self::SCENARIO_CREATE]],

@@ -194,7 +194,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
     /**
      * @return array
      */
-    abstract public function getRules(): array;
+    abstract protected function getRules(): array;
 
     /**
      * @return array
