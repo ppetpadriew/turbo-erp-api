@@ -3,6 +3,8 @@
 namespace App\Models;
 
 
+use Illuminate\Contracts\Support\MessageBag;
+use Illuminate\Support\Facades\Validator;
 use ReflectionClass;
 
 abstract class Model extends \Illuminate\Database\Eloquent\Model
@@ -18,10 +20,18 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      */
     public $timestamps = false;
 
+    /** @var MessageBag */
+    protected $errors;
+    /** @var string */
     protected $scenario = self::SCENARIO_CREATE;
 
+    /** @var array */
     private $scenarios = [];
 
+    /**
+     * Override timestamp fields of laravel
+     * @see https://laravel.com/docs/5.6/eloquent
+     */
     const CREATED_AT = 'created_datetime';
     const UPDATED_AT = 'updated_datetime';
 
@@ -90,6 +100,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
     public function newInstance($attributes = [], $exists = false)
     {
+        /** @var Model $model */
         $model = parent::newInstance($attributes, $exists);
         $scenario = $model->exists
             ? self::SCENARIO_UPDATE
@@ -98,6 +109,40 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         $model->setScenario($scenario);
 
         return $model;
+    }
+
+    public function save(array $options = [])
+    {
+        return $this->validate() && parent::save($options);
+    }
+
+    public function fill(array $attributes)
+    {
+        return parent::fill($attributes + $this->getAttributeDefaultValues());
+    }
+
+    /**
+     * @return MessageBag|null
+     */
+    public function getErrors(): ?MessageBag
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @return bool
+     */
+    public function validate(): bool
+    {
+        $validator = Validator::make(
+            $this->attributes, $this->getRules($this->scenario)
+        );
+
+        if ($validator->fails()) {
+            $this->errors = $validator->errors();
+        }
+
+        return empty($this->errors);
     }
 
     /**

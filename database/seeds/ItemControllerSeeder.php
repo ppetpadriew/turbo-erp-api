@@ -4,7 +4,6 @@ namespace App\Database\Seeds;
 
 
 use App\Models\Item;
-use App\Models\ItemType;
 use App\Models\Unit;
 
 class ItemControllerSeeder extends Seeder
