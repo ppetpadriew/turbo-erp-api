@@ -36,60 +36,22 @@ class Item extends Model
         ];
     }
 
-    public function getRules(string $scenario): array
+    protected function getRules(): array
     {
-        $rules = [
-            self::SCENARIO_CREATE => [
-                'code'              => ['required', 'max:20', "unique:{$this->table}"],
-                'ean'               => ['nullable', 'max:13', "unique:{$this->table}"],
-                'description'       => ['nullable', 'max:100'],
-                'item_type'         => ['required', Rule::in(self::ITEM_TYPES)],
-                'inventory_unit_id' => ['required', 'exists:' . Unit::TABLE . ',id'],
-                'weight'            => ['required', 'numeric'],
-                'weight_unit_id'    => ['required', 'exists:' . Unit::TABLE . ',id'],
-                'lot_controlled'    => ['required', 'boolean'],
-            ],
-            self::SCENARIO_UPDATE => [
-                'ean'               => ['nullable', 'max:13', Rule::unique($this->table)->ignore($this->id)],
-                'description'       => ['nullable', 'max:100'],
-                'item_type'         => ['required', Rule::in(self::ITEM_TYPES)],
-                'inventory_unit_id' => ['required', 'exists:' . Unit::TABLE . ',id'],
-                'weight'            => ['required', 'numeric'],
-                'weight_unit_id'    => ['required', 'exists:' . Unit::TABLE . ',id'],
-                'lot_controlled'    => ['required', 'boolean'],
-            ],
+        return [
+            ['required', ['code'], [self::SCENARIO_CREATE]],
+            ['required', ['item_type', 'inventory_unit_id', 'weight', 'weight_unit_id', 'lot_controlled']],
+            ['max:20', ['code'], [self::SCENARIO_CREATE]],
+            ['max:13', ['ean']],
+            ['max:100', ['description']],
+            ["unique:{$this->table}", ['code'], [self::SCENARIO_CREATE]],
+            [Rule::unique($this->table)->ignore($this->id), ['ean']],
+            ['nullable', ['ean', 'description']],
+            [Rule::in(self::ITEM_TYPES), ['item_type']],
+            ['exists:' . Unit::TABLE . ',id', ['inventory_unit_id', 'weight_unit_id']],
+            ['numeric', ['weight']],
+            ['boolean', ['lot_controlled']],
         ];
-
-        return $scenario
-            ? $rules[$scenario]
-            : $rules;
-    }
-
-    public function getFillable()
-    {
-        $fillable = [
-            self::SCENARIO_CREATE => [
-                'code',
-                'ean',
-                'description',
-                'item_type',
-                'inventory_unit_id',
-                'weight',
-                'weight_unit_id',
-                'lot_controlled',
-            ],
-            self::SCENARIO_UPDATE => [
-                'ean',
-                'description',
-                'item_type',
-                'inventory_unit_id',
-                'weight',
-                'weight_unit_id',
-                'lot_controlled',
-            ],
-        ];
-
-        return $fillable[$this->scenario];
     }
 
     // Relationships
