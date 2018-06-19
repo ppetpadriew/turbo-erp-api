@@ -22,10 +22,16 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
     /** @var MessageBag */
     protected $errors;
+    /** @var string */
     protected $scenario = self::SCENARIO_CREATE;
 
+    /** @var array */
     private $scenarios = [];
 
+    /**
+     * Override timestamp fields of laravel
+     * @see https://laravel.com/docs/5.6/eloquent
+     */
     const CREATED_AT = 'created_datetime';
     const UPDATED_AT = 'updated_datetime';
 
@@ -115,11 +121,17 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         return parent::fill($attributes + $this->getAttributeDefaultValues());
     }
 
+    /**
+     * @return MessageBag|null
+     */
     public function getErrors(): ?MessageBag
     {
         return $this->errors;
     }
 
+    /**
+     * @return bool
+     */
     public function validate(): bool
     {
         $validator = Validator::make(
