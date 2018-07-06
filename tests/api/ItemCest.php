@@ -107,6 +107,8 @@ class ItemCest extends BaseCest
         $this->testCreateWithInvalidEnumFields($I, Item::TABLE, ['item_type']);
     }
 
+    // @todo: testCreateItemWithNullable
+
     public function testUpdateItem(ApiTester $I)
     {
         (new ItemControllerSeeder)->run();

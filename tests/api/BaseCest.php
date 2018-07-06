@@ -95,6 +95,56 @@ abstract class BaseCest
      * @param ApiTester $I
      * @param string $table
      * @param array $fields
+     * @param int $id
+     */
+    protected function testCreateWithTooBigNumber(ApiTester $I, string $table, array $fields, int $id)
+    {
+        $before = $I->grabRecord($table, ['id' => $id]);
+        $tooBig = max($fields) + 1;
+        $updateData = array_fill_keys(array_keys($fields), $tooBig);
+
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $updateData + $before);
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field => $max) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::MAX_NUMERIC, $field, $max));
+        }
+        $after = $I->grabRecord($table, ['id' => $id]);
+        verify($before)->equals($after);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
+     * @param int $id
+     */
+    protected function testCreateWithTooSmallNumber(ApiTester $I, string $table, array $fields, int $id)
+    {
+        $before = $I->grabRecord($table, ['id' => $id]);
+        $tooSmall = min($fields) - 1;
+        $updateData = array_fill_keys(array_keys($fields), $tooSmall);
+
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $updateData + $before);
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field => $max) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::MIN_NUMERIC, $field, $max));
+        }
+        $after = $I->grabRecord($table, ['id' => $id]);
+        verify($before)->equals($after);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
      */
     protected function testCreateWithAlreadyExist(ApiTester $I, string $table, array $fields)
     {
@@ -333,6 +383,56 @@ abstract class BaseCest
         foreach ($fields as $field => $max) {
             verify($response['data'])->hasKey($field);
             verify($response['data'][$field])->contains(sprintf(ValidationMessage::MAX_STRING, $field, $max));
+        }
+        $after = $I->grabRecord($table, ['id' => $id]);
+        verify($before)->equals($after);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
+     * @param int $id
+     */
+    protected function testUpdateWithTooBigNumber(ApiTester $I, string $table, array $fields, int $id)
+    {
+        $before = $I->grabRecord($table, ['id' => $id]);
+        $tooBig = max($fields) + 1;
+        $updateData = array_fill_keys(array_keys($fields), $tooBig);
+
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $updateData + $before);
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field => $max) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::MAX_NUMERIC, $field, $max));
+        }
+        $after = $I->grabRecord($table, ['id' => $id]);
+        verify($before)->equals($after);
+    }
+
+    /**
+     * @param ApiTester $I
+     * @param string $table
+     * @param array $fields
+     * @param int $id
+     */
+    protected function testUpdateWithTooSmallNumber(ApiTester $I, string $table, array $fields, int $id)
+    {
+        $before = $I->grabRecord($table, ['id' => $id]);
+        $tooSmall = min($fields) - 1;
+        $updateData = array_fill_keys(array_keys($fields), $tooSmall);
+
+        $I->sendPUT("{$this->getBaseUrl()}/{$id}", $updateData + $before);
+
+        $I->seeResponseCodeIs(400);
+        $response = $I->grabJsonResponse();
+        verify($response['status'])->equals('fail');
+        foreach ($fields as $field => $max) {
+            verify($response['data'])->hasKey($field);
+            verify($response['data'][$field])->contains(sprintf(ValidationMessage::MIN_NUMERIC, $field, $max));
         }
         $after = $I->grabRecord($table, ['id' => $id]);
         verify($before)->equals($after);
