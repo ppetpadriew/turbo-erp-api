@@ -11,6 +11,7 @@
 |
 */
 
+use App\Http\Controllers\FirstFreeNumberController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
@@ -20,9 +21,10 @@ $router->get('/', function () use ($router) {
 });
 
 $controllers = [
-    'units'      => UnitController::class,
-    'items'      => ItemController::class,
-    'warehouses' => WarehouseController::class,
+    'units'              => UnitController::class,
+    'items'              => ItemController::class,
+    'warehouses'         => WarehouseController::class,
+    'first_free_numbers' => FirstFreeNumberController::class,
 ];
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);
