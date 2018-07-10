@@ -4,7 +4,6 @@ namespace App\Tests\Unit\Models;
 
 use App\Tests\DummyModel;
 use App\Tests\EmptyTableModel;
-use App\Tests\NotImplementGetFillableModel;
 use App\Tests\Unit\Unit;
 
 class ModelTest extends Unit
@@ -40,15 +39,6 @@ class ModelTest extends Unit
     {
         $this->specify('It should throw an exception when calling.', function () {
             (new DummyModel)->fillable([]);
-        }, [
-            'throws' => \Exception::class,
-        ]);
-    }
-
-    public function testGetFillable()
-    {
-        $this->specify('It should throw an exception when sub class does not implement getFillable().', function () {
-            (new NotImplementGetFillableModel)->getFillable();
         }, [
             'throws' => \Exception::class,
         ]);

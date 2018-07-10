@@ -3,6 +3,8 @@
 namespace App\Models;
 
 
+use Illuminate\Contracts\Support\MessageBag;
+use Illuminate\Support\Facades\Validator;
 use ReflectionClass;
 
 abstract class Model extends \Illuminate\Database\Eloquent\Model
@@ -18,10 +20,18 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      */
     public $timestamps = false;
 
+    /** @var MessageBag */
+    protected $errors;
+    /** @var string */
     protected $scenario = self::SCENARIO_CREATE;
 
+    /** @var array */
     private $scenarios = [];
 
+    /**
+     * Override timestamp fields of laravel
+     * @see https://laravel.com/docs/5.6/eloquent
+     */
     const CREATED_AT = 'created_datetime';
     const UPDATED_AT = 'updated_datetime';
 
@@ -99,11 +109,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
     public function getFillable()
     {
-        throw new \Exception('Please define fillable fields in your subclasses.');
+        return array_keys($this->getParsedRules($this->scenario));
     }
 
     public function newInstance($attributes = [], $exists = false)
     {
+        /** @var Model $model */
         $model = parent::newInstance($attributes, $exists);
         $scenario = $model->exists
             ? self::SCENARIO_UPDATE
@@ -114,11 +125,90 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
         return $model;
     }
 
+    public function save(array $options = [])
+    {
+        return $this->validate() && parent::save($options);
+    }
+
+    public function fill(array $attributes)
+    {
+        return parent::fill($attributes + $this->getAttributeDefaultValues());
+    }
+
     /**
+     * @return MessageBag|null
+     */
+    public function getErrors(): ?MessageBag
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function validate(): bool
+    {
+        $validator = Validator::make(
+            $this->attributes,
+            $this->getParsedRules($this->scenario)
+        );
+
+        if ($validator->fails()) {
+            $this->errors = $validator->errors();
+        }
+
+        return empty($this->errors);
+    }
+
+    /**
+     * Parse rules in the format that Laravel can understand
+     * @see https://laravel.com/docs/5.6/validation
+     *
      * @param string $scenario
      * @return array
+     * @throws \Exception
      */
-    abstract public function getRules(string $scenario): array;
+    protected function getParsedRules(string $scenario): array
+    {
+        $parsedRules = $this->parseRules($this->getRules());
+
+        return $parsedRules
+            ? $parsedRules[$scenario]
+            : $parsedRules;
+    }
+
+    /**
+     * @param array $rules
+     * @return array
+     * @throws \Exception
+     */
+    protected function parseRules(array $rules): array
+    {
+        $parsedRules = [];
+        foreach ($rules as $rule) {
+            $validator = $rule[0];
+            $attributes = $rule[1] ?? [];
+            $scenarios = $rule[2] ?? $this->getScenarios();
+
+            if (!is_array($scenarios)) {
+                throw new \Exception('Scenarios must be an array.');
+            }
+
+            foreach ($scenarios as $scenario) {
+                foreach ($attributes as $attribute) {
+                    $parsedRules[$scenario][$attribute][] = $validator;
+                }
+            }
+        }
+
+        return $parsedRules;
+    }
+
+    /**
+     * @return array
+     */
+    abstract protected function getRules(): array;
 
     /**
      * @return array

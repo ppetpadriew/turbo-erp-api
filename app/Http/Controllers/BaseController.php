@@ -50,17 +50,14 @@ abstract class BaseController extends Controller
      */
     public function create(Request $request)
     {
-        $instance = new $this->modelClass;
-        $data = $request->all() + $instance->getAttributeDefaultValues();
-        $validator = Validator::make(
-            $data, $instance->getRules($this->modelClass::SCENARIO_CREATE)
-        );
+        /** @var Model $instance */
+        $instance = new $this->modelClass($request->all());
 
-        if ($validator->fails()) {
-            return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
+        if (!$instance->save()) {
+            return new Response($instance->getErrors(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->modelClass::create($data)->fresh();
+        return $instance->fresh();
     }
 
     /**
@@ -77,15 +74,10 @@ abstract class BaseController extends Controller
             throw new HttpException(404, 'Record not found.');
         }
 
-        $validator = Validator::make($request->all(), $record->getRules($this->modelClass::SCENARIO_UPDATE));
-
-        if ($validator->fails()) {
-            return new Response($validator->errors(), Response::HTTP_BAD_REQUEST);
+        $record->fill($request->all());
+        if (!$record->save()) {
+            return new Response($record->getErrors(), Response::HTTP_BAD_REQUEST);
         }
-
-        $record->fill($request->toArray());
-
-        $record->save();
 
         return $record;
     }

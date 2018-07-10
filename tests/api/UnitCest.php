@@ -37,7 +37,7 @@ class UnitCest extends BaseCest
     public function testCreateUnitWithMissingRequiredFields(ApiTester $I)
     {
         (new UnitControllerSeeder)->run();
-        $this->testCreateWithMissingRequiredFields($I, Unit::TABLE, ['code', 'description']);
+        $this->testCreateWithMissingRequiredFields($I, Unit::TABLE, ['code']);
     }
 
     public function testCreateUnitWithAlreadyExistCode(ApiTester $I)
@@ -70,12 +70,6 @@ class UnitCest extends BaseCest
     {
         (new UnitControllerSeeder)->run();
         $this->testUpdateWithTooLong($I, Unit::TABLE, ['description' => 40], 1);
-    }
-
-    public function testUpdateUnitWithMissingRequiredFields(ApiTester $I)
-    {
-        (new UnitControllerSeeder)->run();
-        $this->testUpdateWithMissingRequiredFields($I, Unit::TABLE, ['description'], 1);
     }
 
     public function testDeleteUnit(ApiTester $I)

@@ -19,31 +19,15 @@ class Unit extends Model
         return [];
     }
 
-    public function getRules(string $scenario): array
+    protected function getRules(): array
     {
-        $rules = [
-            self::SCENARIO_CREATE => [
-                'code'        => ['required', "unique:{$this->table}", 'max:3'],
-                'description' => ['required', 'max:40'],
-            ],
-            self::SCENARIO_UPDATE => [
-                'description' => ['required', 'max:40'],
-            ],
+        return [
+            ['required', ['code'], [self::SCENARIO_CREATE]],
+            ["unique:{$this->table}", ['code'], [self::SCENARIO_CREATE]],
+            ['max:3', ['code'], [self::SCENARIO_CREATE]],
+            ['nullable', ['description']],
+            ['max:40', ['description']],
         ];
-
-        return $scenario
-            ? $rules[$scenario]
-            : $rules;
-    }
-
-    public function getFillable(): array
-    {
-        $fillable = [
-            self::SCENARIO_CREATE => ['code', 'description'],
-            self::SCENARIO_UPDATE => ['description'],
-        ];
-
-        return $fillable[$this->scenario];
     }
 
     // Relationships
