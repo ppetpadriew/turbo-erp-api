@@ -11,19 +11,22 @@
 |
 */
 
+use App\Http\Controllers\BusinessPartnerController;
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseOrderController;
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
 $controllers = [
-    'units'      => UnitController::class,
-    'items'      => ItemController::class,
-    'warehouses' => WarehouseController::class,
+    'units'             => UnitController::class,
+    'items'             => ItemController::class,
+    'warehouses'        => WarehouseController::class,
+    'warehouse_orders'  => WarehouseOrderController::class,
+    'business_partners' => BusinessPartnerController::class,
 ];
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);

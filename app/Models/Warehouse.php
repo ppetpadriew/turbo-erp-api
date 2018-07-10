@@ -2,7 +2,16 @@
 
 namespace App\Models;
 
-
+/**
+ * Class Warehouse
+ * @package App\Models
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $description
+ * @property boolean $negative_inventory_allowed
+ * @property boolean $manual_adjustment_allowed
+ */
 class Warehouse extends Model
 {
     const TABLE = 'warehouse';
