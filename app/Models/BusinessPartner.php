@@ -39,12 +39,11 @@ class BusinessPartner extends Model
 
     // Relations
 
-    // @todo: define relations
-//    /**
-//     * @return BelongsTo
-//     */
-//    public function address(): BelongsTo
-//    {
-//        return $this->belongsTo(Address::class);
-//    }
+    /**
+     * @return BelongsTo
+     */
+    public function address(): BelongsTo
+    {
+        return $this->belongsTo(Address::class);
+    }
 }
