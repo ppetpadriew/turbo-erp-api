@@ -27,8 +27,7 @@ class BusinessPartner extends Model
             ['max:35', ['name']],
             ["unique:{$this->table}", ['name'], [self::SCENARIO_CREATE]],
             [Rule::unique($this->table)->ignore($this->id), ['name'], [self::SCENARIO_UPDATE]],
-            // @todo: add exists validation to address_id field
-            // ['exists:'.Address::TABLE.',id', ['address_id']],
+            ['exists:' . Address::TABLE . ',id', ['address_id']],
         ];
     }
 
