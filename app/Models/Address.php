@@ -3,6 +3,8 @@
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class Address extends Model
 {
     const TABLE = 'address';
@@ -29,7 +31,11 @@ class Address extends Model
     }
 
     // Relations
-    public function businessPartners()
+
+    /**
+     * @return HasMany
+     */
+    public function businessPartners(): HasMany
     {
         return $this->hasMany(BusinessPartner::class);
     }
