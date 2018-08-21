@@ -19,46 +19,16 @@ class BusinessPartner extends Model
 {
     const TABLE = 'business_partner';
 
-    public function getRules(string $scenario): array
+    public function getRules(): array
     {
-        $rules = [
-            self::SCENARIO_CREATE => [
-                'title'      => ['required', 'max:3'],
-                'name'       => ['required', 'max:35', "unique:{$this->table}"],
-                'language'   => ['required', 'max:3'],
-                'address_id' => ['required', 'exists:' . Address::TABLE . ',id'],
-            ],
-            self::SCENARIO_UPDATE => [
-                'title'      => ['required', 'max:3'],
-                'name'       => ['required', 'max:35', Rule::unique($this->table)->ignore($this->id)],
-                'language'   => ['required', 'max:3'],
-                'address_id' => ['required', 'exists:' . Address::TABLE . ',id'],
-            ],
+        return [
+            ['required', ['title', 'name', 'language', 'address_id']],
+            ['max:3', ['title', 'language']],
+            ['max:35', ['name']],
+            ["unique:{$this->table}", ['name'], [self::SCENARIO_CREATE]],
+            [Rule::unique($this->table)->ignore($this->id), ['name'], [self::SCENARIO_UPDATE]],
+            ['exists:' . Address::TABLE . ',id', ['address_id']],
         ];
-
-        return $scenario
-            ? $rules[$scenario]
-            : $rules;
-    }
-
-    public function getFillable()
-    {
-        $fillable = [
-            self::SCENARIO_CREATE => [
-                'title',
-                'name',
-                'language',
-                'address_id',
-            ],
-            self::SCENARIO_UPDATE => [
-                'title',
-                'name',
-                'language',
-                'address_id',
-            ],
-        ];
-
-        return $fillable[$this->scenario];
     }
 
     public function getAttributeDefaultValues(): array

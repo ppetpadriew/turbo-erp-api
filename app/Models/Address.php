@@ -17,17 +17,24 @@ namespace App\Models;
  * @property $country
  *
  */
+
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class Address extends Model
 {
     const TABLE = 'address';
 
     /**
-     * @param string $scenario
      * @return array
      */
-    public function getRules(string $scenario): array
+    protected function getRules(): array
     {
-        // TODO: Implement getRules() method.
+        return [
+            ['required', ['house_number']],
+            ['max:10', ['house_number', 'zip_code', 'country']],
+            ['max:20', ['district', 'sub_district', 'province']],
+            ['max:30', ['detail', 'street']],
+        ];
     }
 
     /**
@@ -35,6 +42,16 @@ class Address extends Model
      */
     public function getAttributeDefaultValues(): array
     {
-        // TODO: Implement getAttributeDefaultValues() method.
+        return [];
+    }
+
+    // Relations
+
+    /**
+     * @return HasMany
+     */
+    public function businessPartners(): HasMany
+    {
+        return $this->hasMany(BusinessPartner::class);
     }
 }

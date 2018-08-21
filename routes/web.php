@@ -10,6 +10,8 @@
  * and give it the Closure to call when that URI is requested.
  */
 
+
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\BusinessPartnerController;
 use App\Http\Controllers\FirstFreeNumberController;
 use App\Http\Controllers\ItemController;
@@ -28,6 +30,8 @@ $controllers = [
     'warehouse_orders'   => WarehouseOrderController::class,
     'business_partners'  => BusinessPartnerController::class,
     'first_free_numbers' => FirstFreeNumberController::class,
+    'business_partners'  => BusinessPartnerController::class,
+    'addresses'          => AddressController::class,
 ];
 foreach ($controllers as $resource => $controller) {
     $baseName = class_basename($controller);
