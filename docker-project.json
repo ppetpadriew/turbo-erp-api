@@ -1,0 +1,51 @@
+{
+  "file": [
+    "./docker/docker-compose.yml"
+  ],
+  "service": "turbo-erp-api-php-fpm",
+  "exec": true,
+  "actions": {
+    "down": {
+      "comment": "Stop and destroy the docker containers",
+      "command": "%action% %args%",
+      "exec": false
+    },
+    "up": {
+      "comment": "Bring the docker containers up and live",
+      "command": "%action% %args%",
+      "exec": false
+    },
+    "pull": {
+      "comment": "Pull the latest versions of docker containers",
+      "command": "%action% %args%",
+      "exec": false
+    },
+    "start": {
+      "comment": "Start the docker containers",
+      "command": "%action% %args%",
+      "exec": false
+    },
+    "stop": {
+      "comment": "Stop the docker containers",
+      "command": "%action% %args%",
+      "exec": false
+    },
+    "ip": {
+      "comment": "Print IP address of given container",
+      "service": "@host",
+      "command": "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' %args%"
+    },
+    "bash": {
+      "comment": "Open the interactive terminal from default service container",
+      "command": "%action% %args%"
+    },
+    "composer": {
+      "comment": "Run the composer command in default service container",
+      "command": "%action% %args%"
+    },
+    "artisan": {
+      "comment": "Run laravel artisan command in default service container",
+      "command": "php %action% %args%"
+    }
+  }
+}
