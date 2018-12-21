@@ -43,10 +43,6 @@
       "comment": "Run the composer command in default service container",
       "command": "%action% %args%"
     },
-    "git": {
-      "comment": "Run the git command in default service container",
-      "command": "%action% %args%"
-    },
     "artisan": {
       "comment": "Run laravel artisan command in default service container",
       "command": "php %action% %args%"
