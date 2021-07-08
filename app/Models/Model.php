@@ -51,6 +51,20 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
     }
 
     /**
+     * Since our convention to name the relation is snake_case. But the method for the relation is camelCase.
+     * So we have to convert snake_case to camelCase.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getRelationValue($key)
+    {
+        $camelizedKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
+
+        return parent::getRelationValue($camelizedKey);
+    }
+
+    /**
      * @param string $scenario
      */
     public function setScenario(string $scenario): void

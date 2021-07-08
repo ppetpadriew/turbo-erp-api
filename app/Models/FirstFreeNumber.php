@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 /**
  * Class FirstFreeNumber
  * @package App\Models

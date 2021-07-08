@@ -2,6 +2,21 @@
 
 namespace App\Models;
 
+/**
+ * Class Address
+ * @package App\Models
+ *
+ * @property int $id
+ * @property string $house_number
+ * @property string $detail
+ * @property string $street
+ * @property string $district
+ * @property string $sub_district
+ * @property string $province
+ * @property $zip_code
+ * @property $country
+ *
+ */
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
